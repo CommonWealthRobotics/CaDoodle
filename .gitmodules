@@ -1,0 +1,3 @@
+[submodule "updater/LatestFromGithubLaunch"]
+	path = updater/LatestFromGithubLaunch
+	url = https://github.com/CommonWealthRobotics/LatestFromGithubLaunch.git
