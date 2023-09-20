@@ -29,14 +29,14 @@ jobs:
          
     - name: Set Release Number Studio
       run: |
-         echo $'app.name=CaDoodle' > application/src/main/resources/com/neuronrobotics/build.properties 
-         echo "app.version=${{ steps.get_version.outputs.VERSION  }}" >> application/src/main/resources/com/neuronrobotics/build.properties 
+         echo $'app.name=CaDoodle' > application/src/main/resources/com/commonwealthrobotics/build.properties 
+         echo "app.version=${{ steps.get_version.outputs.VERSION  }}" >> application/src/main/resources/com/commonwealthrobotics/build.properties 
          
     - name: Set OAuth Key
       env: # Or as an environment variable
          OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
       run: |
-         sed -i "s/REPLACE_ME/$OAUTH_SECRET/g" application/src/main/java/com/neuronrobotics/NameGetter.java        
+         sed -i "s/REPLACE_ME/$OAUTH_SECRET/g" application/src/main/java/com/commonwealthrobotics/NameGetter.java        
            
    
     - name: start xvfb
