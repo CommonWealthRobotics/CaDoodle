@@ -1,0 +1,3 @@
+include ':LatestFromGithubLaunch:LatestFromGithubLaunch'
+rootProject.name = 'CaDoodle'
+
