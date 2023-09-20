@@ -4,7 +4,5 @@ public class CaDoodle{
 
 	public static void main(String [] args){
 		System.out.println("Launching Cadoodle updater");
-		
-		
 	}
 }

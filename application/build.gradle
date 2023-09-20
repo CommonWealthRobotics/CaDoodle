@@ -1,0 +1,18 @@
+plugins {
+	id 'com.github.johnrengelman.shadow' version '5.0.0'
+	id 'java'
+	id 'maven'
+	id 'application'
+}
+repositories {
+    // Use jcenter for resolving dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+
+mainClassName='com.commonwealthrobotics.CaDoodle'
+
+dependencies {
+  
+}
