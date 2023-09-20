@@ -1,0 +1,85 @@
+name: "Release"
+on: 
+   push:
+       tags:       
+         - '*'
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v2
+      with:
+         submodules: recursive 
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}   
+            
+    - name: Configure GIt
+      run: |
+         git config --global user.email "mad.hephaestus@gmail.com"
+         git config --global user.name "Kevin Harrington"
+         git config --global pull.rebase false
+         git config --global core.mergeoptions --no-edit
+         git fetch --depth=1
+         
+         
+    - name: Set Release Number Studio
+      run: |
+         echo $'app.name=BowlerStudio' > src/main/resources/com/neuronrobotics/bowlerstudio/build.properties 
+         echo "app.version=${{ steps.get_version.outputs.VERSION  }}" >> src/main/resources/com/neuronrobotics/bowlerstudio/build.properties 
+         
+    - name: Set OAuth Key
+      env: # Or as an environment variable
+         OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
+      run: |
+         sed -i "s/REPLACE_ME/$OAUTH_SECRET/g" src/main/java/com/neuronrobotics/bowlerstudio/NameGetter.java        
+           
+   
+    - name: start xvfb
+      run:
+        Xvfb :99 &
+
+    - name: initialize the X11 DISPLAY variable
+      run:
+        export DISPLAY=:99  
+
+    - name: Pull a JavaFX JDK
+      run: wget http://static.azul.com/zulu/bin/zulu8.44.0.13-ca-fx-jdk8.0.242-linux_x64.tar.gz
+
+    - name: After JDK download, list directory contnts
+      run: pwd; ls -la
+
+    - name: Set Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        jdkFile: ./zulu8.44.0.13-ca-fx-jdk8.0.242-linux_x64.tar.gz
+
+                
+    - name: Build with Gradle 
+      run: ./gradlew shadowJar
+      
+    - name: release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+            draft: false
+            prerelease: false
+            release_name: ${{ steps.version.outputs.version }}
+            tag_name: ${{ github.ref }}
+      env:
+            GITHUB_TOKEN: ${{ github.token }}
+            
+    - name: upload BowlerStudio artifact
+      uses: actions/upload-release-asset@v1
+      env:
+            GITHUB_TOKEN: ${{ github.token }}
+      with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./build/libs/BowlerStudio.jar
+            asset_name: BowlerStudio.jar
+            asset_content_type: application/jar
