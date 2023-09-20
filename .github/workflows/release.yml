@@ -29,14 +29,14 @@ jobs:
          
     - name: Set Release Number Studio
       run: |
-         echo $'app.name=CaDoodle' > src/main/resources/com/neuronrobotics/bowlerstudio/build.properties 
-         echo "app.version=${{ steps.get_version.outputs.VERSION  }}" >> src/main/resources/com/neuronrobotics/bowlerstudio/build.properties 
+         echo $'app.name=CaDoodle' > application/src/main/resources/com/neuronrobotics/build.properties 
+         echo "app.version=${{ steps.get_version.outputs.VERSION  }}" >> application/src/main/resources/com/neuronrobotics/build.properties 
          
     - name: Set OAuth Key
       env: # Or as an environment variable
          OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
       run: |
-         sed -i "s/REPLACE_ME/$OAUTH_SECRET/g" src/main/java/com/neuronrobotics/bowlerstudio/NameGetter.java        
+         sed -i "s/REPLACE_ME/$OAUTH_SECRET/g" application/src/main/java/com/neuronrobotics/NameGetter.java        
            
    
     - name: start xvfb
@@ -61,7 +61,7 @@ jobs:
 
                 
     - name: Build with Gradle 
-      run: ./gradlew shadowJar
+      run: cd application/; ./gradlew shadowJar;cd ..
       
     - name: release
       uses: actions/create-release@v1
@@ -74,12 +74,12 @@ jobs:
       env:
             GITHUB_TOKEN: ${{ github.token }}
             
-    - name: upload BowlerStudio artifact
+    - name: upload Cadoodle artifact
       uses: actions/upload-release-asset@v1
       env:
             GITHUB_TOKEN: ${{ github.token }}
       with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./build/libs/BowlerStudio.jar
+            asset_path: ./application/build/libs/BowlerStudio.jar
             asset_name: BowlerStudio.jar
             asset_content_type: application/jar
