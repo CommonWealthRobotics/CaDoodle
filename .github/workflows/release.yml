@@ -29,7 +29,7 @@ jobs:
          
     - name: Set Release Number Studio
       run: |
-         echo $'app.name=BowlerStudio' > src/main/resources/com/neuronrobotics/bowlerstudio/build.properties 
+         echo $'app.name=CaDoodle' > src/main/resources/com/neuronrobotics/bowlerstudio/build.properties 
          echo "app.version=${{ steps.get_version.outputs.VERSION  }}" >> src/main/resources/com/neuronrobotics/bowlerstudio/build.properties 
          
     - name: Set OAuth Key
