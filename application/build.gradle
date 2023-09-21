@@ -14,7 +14,7 @@ repositories {
 
 shadowJar {
 	zip64 true
-	mainClassName = 'com.neuronrobotics.bowlerstudio.BowlerStudio'
+	mainClassName = 'com.commonwealthrobotics.CaDoodle'
 	baseName = 'CaDoodle'
 	classifier = ""
 	mergeServiceFiles()
