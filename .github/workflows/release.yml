@@ -83,3 +83,12 @@ jobs:
             asset_path: ./application/build/libs/CaDoodleApplication.jar
             asset_name: CaDoodleApplication.jar 
             asset_content_type: application/jar
+    - name: upload Cadoodle jvm
+      uses: actions/upload-release-asset@v1
+      env:
+            GITHUB_TOKEN: ${{ github.token }}
+      with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./updater/cadoodle-jvm-configuration.json
+            asset_name: cadoodle-jvm-configuration.json 
+            asset_content_type: text
