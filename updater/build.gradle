@@ -11,7 +11,7 @@ repositories {
 }
 
 
-mainClassName='com.commonwealthrobotics.CaDoodle'
+mainClassName='com.commonwealthrobotics.CaDoodleUpdater'
 
 dependencies {
   // This dependency is exported to consumers, that is to say found on their compile classpath.
