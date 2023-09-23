@@ -42,8 +42,7 @@ spotless {
 	java {
 	// don't need to set target, it is inferred from java
 
-	// apply a specific flavor of google-java-format
-	googleJavaFormat('1.7')
+	eclipse()
 	// fix formatting of type annotations
 	formatAnnotations()
 	// make sure every file has the following copyright header.
