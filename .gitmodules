@@ -1,3 +1,6 @@
 [submodule "updater/LatestFromGithubLaunch"]
 	path = updater/LatestFromGithubLaunch
 	url = https://github.com/CommonWealthRobotics/LatestFromGithubLaunch.git
+[submodule "application/BowlerStudio"]
+	path = application/BowlerStudio
+	url = https://github.com/CommonWealthRobotics/BowlerStudio.git
