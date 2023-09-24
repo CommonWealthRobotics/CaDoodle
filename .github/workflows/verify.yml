@@ -37,7 +37,13 @@ jobs:
       with:
         java-version: 1.8
         jdkFile: ./zulu8.44.0.13-ca-fx-jdk8.0.242-linux_x64.tar.gz
-
+        
+    - name: Build updater with Gradle 
+      run: cd updater/; ./gradlew spotlessCheck;cd ..
+      
+    - name: Build  application with Gradle 
+      run: cd application/; ./gradlew spotlessCheck; cd ..
+      
     - name: Build updater with Gradle 
       run: cd updater/; ./gradlew shadowJar
       
