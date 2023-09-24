@@ -6,13 +6,42 @@ plugins {
 	id 'application'
 }
 repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+	// Use jcenter for resolving dependencies.
+	// You can declare any Maven/Ivy/file repository here.
+	jcenter()
+}
+dependencies {
+	compile fileTree (dir: 'lib/', includes: ['*.jar'])
 }
 
 
+File buildDir = file(".");
+Properties props = new Properties()
+props.load(new FileInputStream(buildDir.getAbsolutePath()+"/src/main/resources/com/commonwealthrobotics/build.properties"))
 
+
+jar {
+	//zip64 true
+	jar.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	jar.baseName= "BowlerStudio";
+	// project class files compiled from source
+	//from files(sourceSets.main.output.classesDir)
+	manifest {
+		attributes(
+				"Main-Class": 'com.commonwealthrobotics.CaDoodle',
+				"Manifest-Version": "1.0",
+				"Created-By": "CommonWealth Robotics Cooperative",
+				"Specification-Title": props."app.name",
+				"Specification-Version": props."app.version",
+				"Specification-Vendor": "CommonWealth Robotics Cooperative",
+				"Implementation-Title": props."app.name",
+				"Implementation-Version" : props."app.version",
+				"Implementation-Vendor": "CommonWealth Robotics Cooperative"
+
+
+				)
+	}
+}
 shadowJar {
 	zip64 true
 	mainClassName = 'com.commonwealthrobotics.CaDoodle'
@@ -20,31 +49,29 @@ shadowJar {
 	classifier = ""
 	mergeServiceFiles()
 }
-dependencies {
-  compile fileTree (dir: 'lib/', includes: ['*.jar'])
-}
+
 spotless {
 	// optional: limit format enforcement to just the files changed by this feature branch
 	ratchetFrom 'origin/main'
 
 	format 'misc', {
-	// define the files to apply `misc` to
-	target '*.gradle', '*.md', '.gitignore'
+		// define the files to apply `misc` to
+		target '*.gradle', '*.md', '.gitignore'
 
-	// define the steps to apply to those files
-	trimTrailingWhitespace()
-	indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
-	endWithNewline()
+		// define the steps to apply to those files
+		trimTrailingWhitespace()
+		indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
+		endWithNewline()
 	}
 	java {
-	// don't need to set target, it is inferred from java
+		// don't need to set target, it is inferred from java
 
-	eclipse()
-	// fix formatting of type annotations
-	formatAnnotations()
-	// make sure every file has the following copyright header.
-	// optionally, Spotless can set copyright years by digging
-	// through git history (see "license" section below)
-	licenseHeader '/* (C)$YEAR */'
+		eclipse()
+		// fix formatting of type annotations
+		formatAnnotations()
+		// make sure every file has the following copyright header.
+		// optionally, Spotless can set copyright years by digging
+		// through git history (see "license" section below)
+		licenseHeader '/* (C)$YEAR */'
 	}
 }
