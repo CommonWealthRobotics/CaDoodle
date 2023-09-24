@@ -7,5 +7,6 @@ public class CaDoodle{
 		System.out.println("Build info "+StudioBuildInfo.getVersion());
 		System.out.println("OS "+System.getProperty("os.name"));
 		System.out.println("Archetecture "+System.getProperty("os.arch"));
+		
 	}
 }

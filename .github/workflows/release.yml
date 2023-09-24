@@ -61,7 +61,7 @@ jobs:
 
                 
     - name: Build with Gradle 
-      run: cd application/; ./gradlew shadowJar;cd ..
+      run: cd application/; bash getBowlerStudio.sh ;./gradlew shadowJar;cd ..
       
     - name: release
       uses: actions/create-release@v1

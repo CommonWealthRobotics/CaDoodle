@@ -21,7 +21,7 @@ shadowJar {
 	mergeServiceFiles()
 }
 dependencies {
-  
+  compile fileTree (dir: 'lib/', includes: ['*.jar'])
 }
 spotless {
 	// optional: limit format enforcement to just the files changed by this feature branch

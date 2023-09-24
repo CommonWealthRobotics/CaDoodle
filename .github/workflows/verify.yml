@@ -48,4 +48,4 @@ jobs:
       run: cd updater/; ./gradlew shadowJar
       
     - name: Build  application with Gradle 
-      run: cd application/; ./gradlew shadowJar
+      run: cd application/; bash getBowlerStudio.sh ;./gradlew shadowJar;cd ..
