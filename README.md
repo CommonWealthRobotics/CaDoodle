@@ -26,4 +26,24 @@ This application is Java based and uses BowerStudio as the CAD kernel.
 
 All scripts will be compatible BowlerStudio scripts. 
 
-UI will be laid out in SceneBuilder.
+UI will be laid out in SceneBuilder / JavaFX.
+
+OpenJDK 17 
+
+# Hardware Requirements
+
+The following platforms will be targeted:
+
+* Windows
+* Mac OS (Intel and Aarch64)
+* Linux Ubuntu .deb and flatpack)
+
+16 gb of ram is required. 
+
+The following platforms will not be targeted:
+
+* ChromeOS
+* Androind
+* iOS
+ 
+  
