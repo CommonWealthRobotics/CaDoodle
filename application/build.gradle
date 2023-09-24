@@ -41,7 +41,7 @@ repositories {
 	jcenter()
 }
 dependencies {
-	compile fileTree (dir: 'lib/', includes: ['*.jar'])
+	implementation fileTree(dir: 'lib', include: '*.jar')
 }
 
 

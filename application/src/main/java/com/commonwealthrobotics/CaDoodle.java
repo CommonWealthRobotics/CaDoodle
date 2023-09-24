@@ -2,7 +2,10 @@ package com.commonwealthrobotics;
 
 import com.neuronrobotics.bowlerstudio.BowlerStudio;
 
-public class CaDoodle{
+import javafx.application.Application;
+import javafx.stage.Stage;
+
+public class CaDoodle extends Application{
 
 	public static void main(String [] args){
 		System.out.println("Launching Cadoodle application");
@@ -15,5 +18,11 @@ public class CaDoodle{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void start(Stage arg0) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }
