@@ -37,12 +37,13 @@ The following platforms will be targeted:
 * Windows
 * Mac OS (Intel and Aarch64)
 * Linux Ubuntu .deb and flatpack)
+* ChromeOS
 
 16 gb of ram is required. 
 
 The following platforms will not be targeted:
 
-* ChromeOS
+
 * Androind
 * iOS
  
