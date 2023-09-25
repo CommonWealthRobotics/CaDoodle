@@ -51,3 +51,12 @@ spotless {
 	licenseHeader '/* (C)$YEAR */'
 	}
 }
+
+shadowJar {
+	zip64 true
+	mainClassName = 'com.commonwealthrobotics.CaDoodleUpdater'
+	baseName = 'CaDoodleUpdater'
+	classifier = ""
+	mergeServiceFiles()
+}
+
