@@ -5,3 +5,5 @@
 bin
 *.class
 .settings
+java17*
+*.deb
