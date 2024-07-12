@@ -29,9 +29,9 @@ fi
 
 ./gradlew shadowJar
 echo "Test jar in: $SCRIPT_DIR"
-DIR=$SCRIPT_DIR/lib/build/libs/
+DIR=$SCRIPT_DIR/CaDoodleUpdater/build/libs/
 INPUT_DIR="$SCRIPT_DIR/input"
-JAR_NAME=lib.jar
+JAR_NAME=CaDoodleUpdater.jar
 #$JAVA_HOME/bin/java -jar $DIR/$JAR_NAME
 echo "Test jar complete"
 ls -al $JAVA_HOME
@@ -42,8 +42,8 @@ ICON=$NAME.png
 cp SourceIcon.png $ICON
 rm -rf $SCRIPT_DIR/$NAME
 rm -rf $SCRIPT_DIR/$NAME.AppDir
-BUILDDIR=lib/build/libs/ 
-TARGETJAR=lib.jar
+BUILDDIR=CaDoodleUpdater/build/libs/ 
+TARGETJAR=CaDoodleUpdater.jar
 
 $JAVA_HOME/bin/jpackage --input $BUILDDIR \
   --name $NAME \

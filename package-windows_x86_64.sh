@@ -30,9 +30,9 @@ fi
 echo "Compile wiht gradle"
 ./gradlew shadowJar
 echo "Test jar in: $SCRIPT_DIR"
-DIR="$SCRIPT_DIR/lib/build/libs/"
+DIR="$SCRIPT_DIR/CaDoodleUpdater/build/libs/"
 INPUT_DIR="$SCRIPT_DIR/input"
-JAR_NAME=lib.jar
+JAR_NAME=CaDoodleUpdater.jar
 #$JAVA_HOME/bin/java.exe -jar $DIR/$JAR_NAME
 echo "Test jar complete"
 
