@@ -39,7 +39,7 @@ ls -al $JAVA_HOME
 
 
 ICON=$NAME.png
-cp BowlerStudioIcon.png $ICON
+cp SourceIcon.png $ICON
 rm -rf $SCRIPT_DIR/$NAME
 rm -rf $SCRIPT_DIR/$NAME.AppDir
 BUILDDIR=lib/build/libs/ 

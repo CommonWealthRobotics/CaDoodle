@@ -25,6 +25,9 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
     - uses: microsoft/setup-msbuild@v1.1
     - uses: milliewalky/setup-7-zip@v1
+    - name: Install ImageMagick
+      run: choco install imagemagick -y
+      shell: powershell
     - name: Build
       run: bash package-windows_x86_64.sh
     - name: Upload math result for job Windows

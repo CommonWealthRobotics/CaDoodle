@@ -37,9 +37,7 @@ JAR_NAME=lib.jar
 echo "Test jar complete"
 
 ICON=$NAME.ico
-cp splash.ico $NAME.ico
-
-
+convert SourceIcon.png -define icon:auto-resize=16,32,48,64,128,256 $NAME.ico
 
 PACKAGE="$JAVA_HOME/bin/jpackage.exe"
 mkdir -p "$INPUT_DIR"

@@ -49,7 +49,7 @@ BUILDDIR=lib/build/libs/
 TARGETJAR=lib.jar
 rm -rf *.dmg
 echo "Building DMG..."
-MACIMAGE=MacIconSourceImage.png
+MACIMAGE=SourceIcon.png
 mkdir $NAME.iconset
 sips -z 16 16     $MACIMAGE --out $NAME.iconset/icon_16x16.png
 sips -z 32 32     $MACIMAGE --out $NAME.iconset/icon_16x16@2x.png
