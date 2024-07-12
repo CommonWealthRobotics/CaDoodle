@@ -1,0 +1,59 @@
+# test
+name: Publish package to GitHub Packages
+on: 
+   push:
+
+jobs:
+  linux:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Build
+      run: bash package-linux_x64.sh
+    - name: Upload math result for job Linux
+      uses: actions/upload-artifact@v3
+      with:
+          name: linux-lib
+          path: release/*
+
+  windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - uses: ilammy/msvc-dev-cmd@v1
+    - uses: microsoft/setup-msbuild@v1.1
+    - uses: milliewalky/setup-7-zip@v1
+    - name: Build
+      run: bash package-windows_x86_64.sh
+    - name: Upload math result for job Windows
+      uses: actions/upload-artifact@v3
+      with:
+          name: win-lib
+          path: release/*
+  macos-arm:
+    runs-on: macos-14
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Build
+      run: bash package-macos.sh
+    - name: Upload math result for job Mac
+      uses: actions/upload-artifact@v3
+      with:
+          name: mac-lib-arm
+          path: release/*
+  macos:
+    runs-on: macos-13
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Build
+      run: bash package-macos.sh
+    - name: Upload math result for job Mac
+      uses: actions/upload-artifact@v3
+      with:
+          name: mac-lib-x86
+          path: release/*
+ 
