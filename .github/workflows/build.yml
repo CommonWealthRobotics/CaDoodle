@@ -1,5 +1,5 @@
 # test
-name: Publish package to GitHub Packages
+name: Test package 
 on: 
    push:
 
