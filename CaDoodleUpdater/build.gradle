@@ -52,7 +52,7 @@ application {
 }
 
 shadowJar {
-	archiveBaseName.set('lib')
+	archiveBaseName.set('CaDoodleUpdater')
 	archiveClassifier.set('')
 	archiveVersion.set('')
  }
