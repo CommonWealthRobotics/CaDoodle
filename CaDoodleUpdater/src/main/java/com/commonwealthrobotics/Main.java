@@ -27,7 +27,7 @@ public class Main  extends Application {
 		LatestFromGithubLaunchUI.argsFromSystem=new String[] {
 				"-g",
 				"https://github.com/CommonWealthRobotics/CaDoodle-script.git",
-				"MainWindow.fxml"
+				"Main.groovy"
 		};
 		LatestFromGithubLaunchUI.project="CommonWealthRobotics";
 		LatestFromGithubLaunchUI.repoName=		"BowlerStudio";
