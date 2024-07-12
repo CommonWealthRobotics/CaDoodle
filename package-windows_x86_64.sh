@@ -37,8 +37,15 @@ JAR_NAME=CaDoodleUpdater.jar
 echo "Test jar complete"
 
 ICON=$NAME.ico
-convert SourceIcon.png -define icon:auto-resize=16,32,48,64,128,256 $NAME.ico
+magick convert $NAME.ico -resize 256x256 your_image_256.png
+magick convert $NAME.ico -resize 128x128 your_image_128.png
+magick convert $NAME.ico -resize 64x64 your_image_64.png
+magick convert $NAME.ico -resize 48x48 your_image_48.png
+magick convert $NAME.ico -resize 32x32 your_image_32.png
+magick convert $NAME.ico -resize 16x16 your_image_16.png
 
+magick convert your_image_16.png your_image_32.png your_image_48.png your_image_64.png your_image_128.png your_image_256.png output.ico
+    
 PACKAGE="$JAVA_HOME/bin/jpackage.exe"
 mkdir -p "$INPUT_DIR"
 cp "$DIR/$JAR_NAME" "$INPUT_DIR/"
