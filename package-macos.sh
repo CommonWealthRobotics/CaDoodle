@@ -1,5 +1,5 @@
 #https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-macosx_x64.tar.gz
-NAME=BowlerLauncher
+NAME=CaDoodle
 VERSION=1.0.1
 MAIN=com.commonwealthrobotics.Main
 

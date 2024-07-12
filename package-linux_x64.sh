@@ -1,6 +1,6 @@
 #https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-linux_x64.tar.gz
 #   zulu17.50.19-ca-fx-jdk17.0.11-linux_x64
-NAME=BowlerLauncher
+NAME=CaDoodle
 VERSION=0.0.1
 MAIN=com.commonwealthrobotics.Main
 

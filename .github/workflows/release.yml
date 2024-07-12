@@ -125,8 +125,8 @@ jobs:
                GITHUB_TOKEN: ${{ github.token }}
         with:
                upload_url: ${{ steps.create_release.outputs.upload_url }}
-               asset_path: BowlerLauncher-Linux-x86_64.AppImage
-               asset_name: BowlerLauncher-Linux-x86_64.AppImage
+               asset_path: CaDoodle-Linux-x86_64.AppImage
+               asset_name: CaDoodle-Linux-x86_64.AppImage
                asset_content_type: application/octet-stream
       - name: upload Debian 
         uses: actions/upload-release-asset@v1
@@ -134,8 +134,8 @@ jobs:
                GITHUB_TOKEN: ${{ github.token }}
         with:
                upload_url: ${{ steps.create_release.outputs.upload_url }}
-               asset_path: BowlerLauncher-Linux-x86_64.deb
-               asset_name: BowlerLauncher-Linux-x86_64.deb
+               asset_path: CaDoodle-Linux-x86_64.deb
+               asset_name: CaDoodle-Linux-x86_64.deb
                asset_content_type: application/octet-stream                 
       - name: upload Windows exe
         uses: actions/upload-release-asset@v1
@@ -143,8 +143,8 @@ jobs:
                GITHUB_TOKEN: ${{ github.token }}
         with:
                upload_url: ${{ steps.create_release.outputs.upload_url }}
-               asset_path: BowlerLauncher-Windows-x86_64.exe
-               asset_name: BowlerLauncher-Windows-x86_64.exe
+               asset_path: CaDoodle-Windows-x86_64.exe
+               asset_name: CaDoodle-Windows-x86_64.exe
                asset_content_type: application/exe        
       - name: upload Windows zip
         uses: actions/upload-release-asset@v1
@@ -152,8 +152,8 @@ jobs:
                GITHUB_TOKEN: ${{ github.token }}
         with:
                upload_url: ${{ steps.create_release.outputs.upload_url }}
-               asset_path: BowlerLauncher-Windows-x86_64.zip
-               asset_name: BowlerLauncher-Windows-x86_64.zip
+               asset_path: CaDoodle-Windows-x86_64.zip
+               asset_name: CaDoodle-Windows-x86_64.zip
                asset_content_type: application/zip        
       - name: upload MacOS dmg x86
         uses: actions/upload-release-asset@v1
@@ -161,8 +161,8 @@ jobs:
                GITHUB_TOKEN: ${{ github.token }}
         with:
                upload_url: ${{ steps.create_release.outputs.upload_url }}
-               asset_path: BowlerLauncher-MacOS-x86_64.dmg
-               asset_name: BowlerLauncher-MacOS-x86_64.dmg
+               asset_path: CaDoodle-MacOS-x86_64.dmg
+               asset_name: CaDoodle-MacOS-x86_64.dmg
                asset_content_type: application/octet-stream 
       - name: upload MacOS dmg arm
         uses: actions/upload-release-asset@v1
@@ -170,6 +170,6 @@ jobs:
                GITHUB_TOKEN: ${{ github.token }}
         with:
                upload_url: ${{ steps.create_release.outputs.upload_url }}
-               asset_path: BowlerLauncher-MacOS-arm64.dmg
-               asset_name: BowlerLauncher-MacOS-arm64.dmg
+               asset_path: CaDoodle-MacOS-arm64.dmg
+               asset_name: CaDoodle-MacOS-arm64.dmg
                asset_content_type: application/octet-stream 

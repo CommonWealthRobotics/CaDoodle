@@ -1,6 +1,6 @@
 echo "Windows bundling"
 VERSION=0.0.1
-NAME=BowlerLauncher
+NAME=CaDoodle
 MAIN=com.commonwealthrobotics.Main
 
 if [[ -z "${VERSION_SEMVER}" ]]; then
