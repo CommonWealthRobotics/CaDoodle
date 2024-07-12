@@ -23,8 +23,12 @@ public class Main  extends Application {
 		stage.show();
 	}
 	public static void main(String [] args) {
-		LatestFromGithubLaunchUI.argsFromSystem=args;
-		
+		//LatestFromGithubLaunchUI.argsFromSystem=args;
+		LatestFromGithubLaunchUI.argsFromSystem=new String[] {
+				"-g",
+				"https://github.com/CommonWealthRobotics/CaDoodle-script.git",
+				"MainWindow.fxml"
+		};
 		LatestFromGithubLaunchUI.project="CommonWealthRobotics";
 		LatestFromGithubLaunchUI.repoName=		"BowlerStudio";
 		LatestFromGithubLaunchUI.jarName=		"BowlerStudio.jar";
