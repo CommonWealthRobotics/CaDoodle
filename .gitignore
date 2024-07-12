@@ -21,3 +21,6 @@ HatRack*
 **.deb
 release
 **.DS_Store**
+**AppDir**
+CaDoodle
+/CaDoodle.png
