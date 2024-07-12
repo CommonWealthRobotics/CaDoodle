@@ -42,7 +42,7 @@ JAR_NAME=CaDoodleUpdater.jar
 echo "Test jar complete"
 
 ICON=$NAME.png
-cp BowlerStudioIcon.png $ICON
+cp SourceIcon.png $ICON
 rm -rf $SCRIPT_DIR/$NAME
 rm -rf $SCRIPT_DIR/$NAME.AppDir
 BUILDDIR=CaDoodleUpdater/build/libs/ 
