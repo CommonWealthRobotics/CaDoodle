@@ -46,59 +46,67 @@ import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 
 public class JvmManager {
+	private static long timeSincePrint = System.currentTimeMillis();
 
 	public static String getCommandString(String project, String repo, String version, String downloadJsonURL,
 			long sizeOfJson, ProgressBar progress, String bindir) throws Exception {
-		if(version==null)
-			version="0.0.6";
+		if (version == null)
+			version = "0.0.6";
 		File exe;
-		
-		exe= download(version, downloadJsonURL, sizeOfJson, progress, bindir, "jvm.json");
-		Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {
-		}.getType();
-		// chreat the gson object, this is the parsing factory
-		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-		String jsonText = Files.readString(exe.toPath());
+		File jvmArchive;
+		File dest;
+		try {
+			exe = download(version, downloadJsonURL, sizeOfJson, progress, bindir, "jvm.json");
+			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {
+			}.getType();
+			// chreat the gson object, this is the parsing factory
+			Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+			String jsonText = Files.readString(exe.toPath());
 
-		HashMap<String, Object> database = gson.fromJson(jsonText, TT_mapStringString);
-		String key = "UNKNOWN";
-		key = discoverKey(key);
-		Map<String, Object> vm = (Map<String, Object>) database.get(key);
-		String baseURL = vm.get("url").toString();
-		String type = vm.get("type").toString();
-		String name = vm.get("name").toString();
-		List<String> jvmargs = null;
-		Object o = vm.get("jvmargs");
-		if (o != null)
-			jvmargs = (List<String>) o;
-		else
-			jvmargs = new ArrayList<String>();
-		String jvmURL = baseURL + name + "." + type;
-		File jvmArchive = download("", jvmURL, 185000000, progress, bindir, name + "." + type);
-		File dest = new File(bindir + name);
-		if (!dest.exists()) {
-			if (type.toLowerCase().contains("zip")) {
-				try {
-					unzip(jvmArchive, bindir);
-				}catch(java.util.zip.ZipException ex) {
-					System.out.println("Failed the extract, erasing and re-downloading");
-					jvmArchive.delete();
-					ex.printStackTrace();
-					return getCommandString(project,  repo,  version,  downloadJsonURL,
-							 sizeOfJson,  progress,  bindir);
+			HashMap<String, Object> database = gson.fromJson(jsonText, TT_mapStringString);
+			String key = "UNKNOWN";
+			key = discoverKey(key);
+			Map<String, Object> vm = (Map<String, Object>) database.get(key);
+			String baseURL = vm.get("url").toString();
+			String type = vm.get("type").toString();
+			String name = vm.get("name").toString();
+			List<String> jvmargs = null;
+			Object o = vm.get("jvmargs");
+			if (o != null)
+				jvmargs = (List<String>) o;
+			else
+				jvmargs = new ArrayList<String>();
+			String jvmURL = baseURL + name + "." + type;
+			jvmArchive = download("", jvmURL, 300000000, progress, bindir, name + "." + type);
+			dest = new File(bindir + name);
+			if (!dest.exists()) {
+				if (type.toLowerCase().contains("zip")) {
+					try {
+						unzip(jvmArchive, bindir);
+					} catch (java.util.zip.ZipException ex) {
+						System.out.println("Failed the extract, erasing and re-downloading");
+						jvmArchive.delete();
+						ex.printStackTrace();
+						return getCommandString(project, repo, version, downloadJsonURL, sizeOfJson, progress, bindir);
+					}
 				}
+				if (type.toLowerCase().contains("tar.gz")) {
+					untar(jvmArchive, bindir);
+				}
+			} else {
+				System.out.println("Not extraction, VM exists " + dest.getAbsolutePath());
 			}
-			if (type.toLowerCase().contains("tar.gz")) {
-				untar(jvmArchive, bindir);
+			String cmd = bindir + name + "/bin/java" + (CadoodleUpdater.isWin() ? ".exe" : "") + " ";
+			for (String s : jvmargs) {
+				cmd += s + " ";
 			}
-		} else {
-			System.out.println("Not extraction, VM exists " + dest.getAbsolutePath());
+			return cmd + " -jar ";
+		} catch (java.io.EOFException ex) {
+			ex.printStackTrace();
+			System.err.println("JVM is currupted");
+			System.exit(1);
 		}
-		String cmd = bindir + name + "/bin/java" + (CadoodleUpdater.isWin() ? ".exe" : "") + " ";
-		for (String s : jvmargs) {
-			cmd += s + " ";
-		}
-		return cmd + " -jar ";
+		return null;
 	}
 
 	private static String discoverKey(String key) {
@@ -177,18 +185,24 @@ public class JvmManager {
 		}
 	}
 
-	private static void untar(File tarFile, String dir) throws Exception {
+	public static void untar(File tarFile, String dir) throws Exception {
+		System.out.println("Untaring " + tarFile.getName() + " into " + dir);
+
 		File dest = new File(dir);
 		dest.mkdir();
 		TarArchiveInputStream tarIn = null;
-
-		tarIn = new TarArchiveInputStream(
-				new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(tarFile))));
+		try {
+			tarIn = new TarArchiveInputStream(
+					new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(tarFile))));
+		} catch (java.io.IOException ex) {
+			tarFile.delete();
+			return;
+		}
 		TarArchiveEntry tarEntry = tarIn.getNextTarEntry();
 		// tarIn is a TarArchiveInputStream
 		while (tarEntry != null) {// create a file with the same name as the tarEntry
 			File destPath = new File(dest.toString() + System.getProperty("file.separator") + tarEntry.getName());
-			// System.out.println("working: " + destPath.getCanonicalPath());
+			System.out.println("Inflating: " + destPath.getCanonicalPath());
 			if (tarEntry.isDirectory()) {
 				destPath.mkdirs();
 			} else {
@@ -226,9 +240,14 @@ public class JvmManager {
 			pis.addListener(new Listener() {
 				@Override
 				public void process(double percent) {
-					//System.out.println("Download percent " + percent);
+					if(System.currentTimeMillis()-timeSincePrint>1000) {
+						timeSincePrint=System.currentTimeMillis();
+						 System.out.println("Download " + filename + " percent " + percent);
+
+					}
 					Platform.runLater(() -> {
-						progress.setProgress(percent);
+						if(percent<100)
+							progress.setProgress(percent);
 					});
 				}
 			});
@@ -252,7 +271,7 @@ public class JvmManager {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		System.out.println("Using JVM "+exe.getAbsolutePath());
+		System.out.println("Using JVM " + exe.getAbsolutePath());
 		return exe;
 	}
 }
