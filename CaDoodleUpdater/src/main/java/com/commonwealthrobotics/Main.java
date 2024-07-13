@@ -23,15 +23,10 @@ public class Main  extends Application {
 		stage.show();
 	}
 	public static void main(String [] args) {
-		//LatestFromGithubLaunchUI.argsFromSystem=args;
-		LatestFromGithubLaunchUI.argsFromSystem=new String[] {
-				"-g",
-				"https://github.com/CommonWealthRobotics/CaDoodle-script.git",
-				"Main.groovy"
-		};
+		LatestFromGithubLaunchUI.argsFromSystem=args;
 		LatestFromGithubLaunchUI.project="CommonWealthRobotics";
-		LatestFromGithubLaunchUI.repoName=		"BowlerStudio";
-		LatestFromGithubLaunchUI.jarName=		"BowlerStudio.jar";
+		LatestFromGithubLaunchUI.repoName=		"CaDoodle-Application";
+		LatestFromGithubLaunchUI.jarName=		"CaDoodle-Application.jar ";
 		
 		launch(args);
 	}

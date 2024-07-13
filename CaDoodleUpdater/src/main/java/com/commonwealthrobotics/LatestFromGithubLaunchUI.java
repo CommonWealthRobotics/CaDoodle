@@ -100,6 +100,7 @@ public class LatestFromGithubLaunchUI {
 
 			try {
 				String downloadURL2 = downloadJarURL;
+				System.out.println("Downloading "+downloadJarURL);
 				URL url = new URL(downloadURL2);
 				URLConnection connection = url.openConnection();
 				InputStream is = connection.getInputStream();
@@ -257,6 +258,7 @@ public class LatestFromGithubLaunchUI {
 			latestVersionString = (String) database.get("tag_name");
 			@SuppressWarnings("unchecked")
 			List<Map<String, Object>> assets = (List<Map<String, Object>>) database.get("assets");
+			downloadJarURL=null;
 			for (Map<String, Object> key : assets) {
 				if (((String) key.get("name")).contentEquals(jarName)) {
 					downloadJarURL = (String) key.get("browser_download_url");
@@ -269,6 +271,10 @@ public class LatestFromGithubLaunchUI {
 					System.out.println(downloadJsonURL + " Size " + sizeOfJson + " bytes");
 				}
 				
+			}
+			if(downloadJarURL==null) {
+				System.err.println("FAIL the Jar is missing in release "+latestVersionString);
+				System.exit(1);
 			}
 		} finally {
 			is.close();
