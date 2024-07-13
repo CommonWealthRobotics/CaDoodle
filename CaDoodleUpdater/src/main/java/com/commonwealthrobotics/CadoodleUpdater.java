@@ -260,16 +260,21 @@ public class CadoodleUpdater {
 			List<Map<String, Object>> assets = (List<Map<String, Object>>) database.get("assets");
 			downloadJarURL=null;
 			for (Map<String, Object> key : assets) {
-				if (((String) key.get("name")).contentEquals(jarName)) {
+				String string = (String) key.get("name");
+
+				System.out.println("Checking "+string);
+				if (string.contentEquals(jarName)) {
 					downloadJarURL = (String) key.get("browser_download_url");
 					sizeOfJar = ((Double) key.get("size")).longValue();
 					System.out.println(downloadJarURL + " Size " + sizeOfJar + " bytes");
-				}
-				if (((String) key.get("name")).contentEquals("jvm.json")) {
+				}else
+					System.out.println(string+" is not "+jarName);
+				if (string.contentEquals("jvm.json")) {
 					downloadJsonURL = (String) key.get("browser_download_url");
 					sizeOfJson = ((Double) key.get("size")).longValue();
 					System.out.println(downloadJsonURL + " Size " + sizeOfJson + " bytes");
-				}
+				}else
+					System.out.println(string+" is not jvm.json");
 				
 			}
 			if(downloadJarURL==null) {

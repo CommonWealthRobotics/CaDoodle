@@ -26,7 +26,7 @@ public class Main  extends Application {
 		CadoodleUpdater.argsFromSystem=args;
 		CadoodleUpdater.project="CommonWealthRobotics";
 		CadoodleUpdater.repoName=		"CaDoodle-Application";
-		CadoodleUpdater.jarName=		"CaDoodle-Application.jar ";
+		CadoodleUpdater.jarName=		"CaDoodle-Application.jar";
 		
 		launch(args);
 	}
