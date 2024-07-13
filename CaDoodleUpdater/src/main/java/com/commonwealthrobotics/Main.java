@@ -13,7 +13,7 @@ public class Main  extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		LatestFromGithubLaunchUI.stage=stage;
+		CadoodleUpdater.stage=stage;
 		Parent root = FXMLLoader.load(Main.class.getResource("ui.fxml"));
 
 		Scene scene = new Scene(root, 600, 523);
@@ -23,10 +23,10 @@ public class Main  extends Application {
 		stage.show();
 	}
 	public static void main(String [] args) {
-		LatestFromGithubLaunchUI.argsFromSystem=args;
-		LatestFromGithubLaunchUI.project="CommonWealthRobotics";
-		LatestFromGithubLaunchUI.repoName=		"CaDoodle-Application";
-		LatestFromGithubLaunchUI.jarName=		"CaDoodle-Application.jar ";
+		CadoodleUpdater.argsFromSystem=args;
+		CadoodleUpdater.project="CommonWealthRobotics";
+		CadoodleUpdater.repoName=		"CaDoodle-Application";
+		CadoodleUpdater.jarName=		"CaDoodle-Application.jar ";
 		
 		launch(args);
 	}

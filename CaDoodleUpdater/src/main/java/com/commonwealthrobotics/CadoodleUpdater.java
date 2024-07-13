@@ -37,7 +37,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-public class LatestFromGithubLaunchUI {
+public class CadoodleUpdater {
 	public static String[] argsFromSystem;
 	//public static String[] args;
 	public static String project;

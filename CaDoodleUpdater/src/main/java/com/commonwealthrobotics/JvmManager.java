@@ -94,7 +94,7 @@ public class JvmManager {
 		} else {
 			System.out.println("Not extraction, VM exists " + dest.getAbsolutePath());
 		}
-		String cmd = bindir + name + "/bin/java" + (LatestFromGithubLaunchUI.isWin() ? ".exe" : "") + " ";
+		String cmd = bindir + name + "/bin/java" + (CadoodleUpdater.isWin() ? ".exe" : "") + " ";
 		for (String s : jvmargs) {
 			cmd += s + " ";
 		}
@@ -102,23 +102,23 @@ public class JvmManager {
 	}
 
 	private static String discoverKey(String key) {
-		if (LatestFromGithubLaunchUI.isLin()) {
-			if (LatestFromGithubLaunchUI.isArm()) {
+		if (CadoodleUpdater.isLin()) {
+			if (CadoodleUpdater.isArm()) {
 				key = "Linux-aarch64";
 			} else {
 				key = "Linux-x64";
 			}
 		}
 
-		if (LatestFromGithubLaunchUI.isMac()) {
-			if (LatestFromGithubLaunchUI.isArm()) {
+		if (CadoodleUpdater.isMac()) {
+			if (CadoodleUpdater.isArm()) {
 				key = "Mac-aarch64";
 			} else {
 				key = "Mac-x64";
 			}
 		}
-		if (LatestFromGithubLaunchUI.isWin()) {
-			if (LatestFromGithubLaunchUI.isArm()) {
+		if (CadoodleUpdater.isWin()) {
+			if (CadoodleUpdater.isArm()) {
 				key = "UNKNOWN";
 			} else {
 				key = "Windows-x64";
