@@ -211,7 +211,7 @@ public class CadoodleUpdater {
 						}
 					}
 					reader.close();
-					System.out.println("LatestFromGithubLaunch clean exit");
+					System.out.println("CaDoodle Updater clean exit");
 					System.exit(0);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
