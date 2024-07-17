@@ -199,18 +199,55 @@ public class CadoodleUpdater {
 			new Thread(() -> {
 				try {
 					Process process = Runtime.getRuntime().exec(finalCommand);
-					BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					String line;
-					while ((line = reader.readLine()) != null && process.isAlive()) {
-						System.out.println(line);
+					Thread thread = new Thread(()->{
+						BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+						String line;
 						try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {
+							while ((line = reader.readLine()) != null&& 
+									process.isAlive()) {
+								System.err.println(line);
+								try {
+									Thread.sleep(10);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+							reader.close();
+						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+					});
+					thread.start();
+					Thread thread2 = new Thread(()->{
+						BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+						String line;
+						try {
+							while ((line = reader.readLine()) != null&& 
+									process.isAlive()) {
+								System.out.println(line);
+								try {
+									Thread.sleep(10);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+							reader.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					});
+					thread2.start();
+					try {
+						thread2.join();
+						thread.join();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-					reader.close();
 					System.out.println("CaDoodle Updater clean exit");
 					System.exit(0);
 				} catch (IOException e) {
