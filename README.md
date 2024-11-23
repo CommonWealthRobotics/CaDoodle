@@ -1,6 +1,10 @@
 # CaDoodle
 A free and open source CAD package using drag-and-drop shapes. 
 
+# Source Code
+
+https://github.com/CommonWealthRobotics/CaDoodle-Application
+
 # Inspiration
 
 The workflow of Tinkercad is an excellent experience for novice users of CAD. 
