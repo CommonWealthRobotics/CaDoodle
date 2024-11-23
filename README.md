@@ -1,6 +1,10 @@
 # CaDoodle
 A free and open source CAD package using drag-and-drop shapes. 
 
+# Download
+
+[Download and Install here](https://github.com/CommonWealthRobotics/CaDoodle/releases)
+
 # Source Code
 
 This repository is the installer and auto-updater. The installable releases are found here. 
