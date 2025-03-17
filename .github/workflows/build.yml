@@ -11,7 +11,7 @@ on:
 
 jobs:
   linux-arm:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     steps:
     - name: Checkout
       uses: actions/checkout@v1
