@@ -55,13 +55,27 @@ The following platforms will be targeted:
 * Mac OS (Intel and Aarch64)
 * Linux Ubuntu .deb and flatpack)
 * ChromeOS
-
-16 gb of ram is required. 
-
+* 8 gb of ram is required.
+  
 The following platforms will not be targeted:
-
 
 * Androind
 * iOS
+
+## Chrome OS Instructions
+
+First, set up Linux using the instructions : https://support.google.com/chromebook/answer/9145439?hl=en
+
+Next download the Linux .DEB installer from : https://github.com/CommonWealthRobotics/CaDoodle/releases
+
+Finally double-click on the .DEB to install CaDoodle.
+
+You can now launch CaDoodle from the applications launcher window. 
+
+
+
+
+
+
  
   
