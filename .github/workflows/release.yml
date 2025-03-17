@@ -148,6 +148,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
+            CaDoodle-Linux-arm86_64.AppImage
+            CaDoodle-Linux-arm86_64.deb
             CaDoodle-Linux-x86_64.AppImage
             CaDoodle-Linux-x86_64.deb
             CaDoodle-Windows-x86_64.exe
