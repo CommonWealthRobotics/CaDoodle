@@ -10,15 +10,27 @@ on:
       - '*'
 
 jobs:
+  linux-arm:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Build
+      run: bash package-linux_arm64.sh
+    - name: Upload math result for job Linux
+      uses: actions/upload-artifact@v4
+      with:
+          name: linux-arm-lib
+          path: release/*
   linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Checkout
       uses: actions/checkout@v1
     - name: Build
       run: bash package-linux_x64.sh
     - name: Upload math result for job Linux
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: linux-lib
           path: release/*
@@ -37,7 +49,7 @@ jobs:
     - name: Build
       run: bash package-windows_x86_64.sh
     - name: Upload math result for job Windows
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: win-lib
           path: release/*
@@ -49,7 +61,7 @@ jobs:
     - name: Build
       run: bash package-macos.sh
     - name: Upload math result for job Mac
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: mac-lib-arm
           path: release/*
@@ -61,7 +73,7 @@ jobs:
     - name: Build
       run: bash package-macos.sh
     - name: Upload math result for job Mac
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: mac-lib-x86
           path: release/*
