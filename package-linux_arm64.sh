@@ -113,7 +113,7 @@ ls -al
 rm -rf release
 mkdir release
 cp *.deb release/$NAME-Linux-$ARCH.deb
-cp $NAME-$ARCH.AppImage release/$NAME-Linux-$ARCH.AppImage
+cp $NAME-aarch64.AppImage release/$NAME-Linux-$ARCH.AppImage
 #sudo apt remove bowlerlauncher
 #sudo dpkg -i *.deb
 
