@@ -4,6 +4,8 @@ NAME=CaDoodle
 VERSION=0.0.1
 MAIN=com.commonwealthrobotics.Main
 
+sudo apt install fuse 
+
 if [[ -z "${VERSION_SEMVER}" ]]; then
   VERSION=4.0.4
 else
