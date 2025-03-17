@@ -83,11 +83,11 @@ cp $ICON $NAME.AppDir/$NAME.png
 
 
 # Step 2: Install AppImageTool (done once)
-TOOL=appimagetool-x86_64.AppImage
+TOOL=appimagetool-aarch64.AppImage
 if test -f $TOOL; then
 	echo $TOOL exists
 else
-	wget https://github.com/AppImage/AppImageKit/releases/download/continuous/$TOOL
+	wget https://github.com/AppImage/appimagetool/releases/download/continuous/$TOOL
 	chmod +x $TOOL
 fi
 
