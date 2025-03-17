@@ -6,6 +6,25 @@ on:
          - '*'
 
 jobs:
+
+  linux-arm:
+    runs-on: ubuntu-24.04-arm
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//} 
+    - name: Build
+      env:
+         VERSION_SEMVER: ${{steps.get_version.outputs.VERSION }}
+      run: bash package-linux_arm64.sh
+    - name: Upload  result for job Linux
+      uses: actions/upload-artifact@v4
+      with:
+          name: linux-arm-lib
+          path: release/*
+
   linux:
     runs-on: ubuntu-24.04
     steps:
@@ -18,7 +37,7 @@ jobs:
       env:
          VERSION_SEMVER: ${{steps.get_version.outputs.VERSION }}
       run: bash package-linux_x64.sh
-    - name: Upload math result for job Linux
+    - name: Upload  result for job Linux
       uses: actions/upload-artifact@v4
       with:
           name: linux-lib
@@ -39,7 +58,7 @@ jobs:
       env:
          VERSION_SEMVER: ${{steps.get_version.outputs.VERSION }}
       run: bash package-windows_x86_64.sh
-    - name: Upload math result for job Windows
+    - name: Upload  result for job Windows
       uses: actions/upload-artifact@v4
       with:
           name: win-lib
@@ -56,7 +75,7 @@ jobs:
       env:
          VERSION_SEMVER: ${{steps.get_version.outputs.VERSION }}
       run: bash package-macos.sh
-    - name: Upload math result for job Mac
+    - name: Upload  result for job Mac
       uses: actions/upload-artifact@v4
       with:
           name: mac-lib-arm
@@ -73,14 +92,14 @@ jobs:
       env:
          VERSION_SEMVER: ${{steps.get_version.outputs.VERSION }}
       run: bash package-macos.sh
-    - name: Upload math result for job Mac
+    - name: Upload  result for job Mac
       uses: actions/upload-artifact@v4
       with:
           name: mac-lib-x86
           path: release/*
   publish:
     runs-on: ubuntu-latest 
-    needs: [macos,windows,linux,macos-arm]
+    needs: [macos,windows,linux,macos-arm,  linux-arm]
     permissions: 
       contents: write
       packages: write 
@@ -95,25 +114,30 @@ jobs:
         run: |
           echo $VERSION_SEMVER
           echo ${{ steps.vars.outputs.tag }}
-      - name: Download math result for job Windows
+      - name: Download  result for job Windows
         uses: actions/download-artifact@v4
         with:
           name: win-lib 
           path: .
-      - name: Download math result for job Linux
+      - name: Download  result for job Linux
         uses: actions/download-artifact@v4
         with:
           name: linux-lib 
           path: .
-      - name: Download math result for job Mac-arm
+      - name: Download  result for job Mac-arm
         uses: actions/download-artifact@v4
         with:
           name: mac-lib-arm
           path: .
-      - name: Download math result for job Mac-x86
+      - name: Download  result for job Mac-x86
         uses: actions/download-artifact@v4
         with:
           name: mac-lib-x86
+          path: .
+      - name: Download  result for job Linux ARM
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-arm-lib
           path: .
       - name: Check downloads
         run: |
