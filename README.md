@@ -1,7 +1,7 @@
 # CaDoodle
 A free and open source CAD package using drag-and-drop shapes. 
 
-[![Github All Releases](https://img.shields.io/github/downloads/CommonWealthRobotics/CaDoodle/total.svg)]()
+Installers: [![Github All Releases](https://img.shields.io/github/downloads/CommonWealthRobotics/CaDoodle/total.svg)]() Application: [![Github All Releases](https://img.shields.io/github/downloads/CommonWealthRobotics/CaDoodle-Application/total.svg)]()
 
 ![Screen Shot](CaDoodle-Screenshot.png)
 
