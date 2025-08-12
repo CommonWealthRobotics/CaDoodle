@@ -27,7 +27,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +64,8 @@ public class CadoodleUpdater {
 	private Label binary; // Value injected by FXMLLoader
 	@FXML // fx:id="currentVersion"
 	private Label currentVersion; // Value injected by FXMLLoader
-
+	@FXML // fx:id="currentVersion"
+	private Label infoBar;
 	@FXML // fx:id="yesButton"
 	private Button yesButton; // Value injected by FXMLLoader
 
@@ -96,9 +99,11 @@ public class CadoodleUpdater {
 		System.out.println("Yes path");
 		yesButton.setDisable(true);
 		noButton.setDisable(true);
+		infoBar.setText("Downloading CaDoodle JAR...");
 		new Thread(() -> {
 
 			try {
+				
 				String downloadURL2 = downloadJarURL;
 				System.out.println("Downloading "+downloadJarURL);
 				URL url = new URL(downloadURL2);
@@ -114,10 +119,13 @@ public class CadoodleUpdater {
 					}
 				});
 				File folder = new File(bindir + latestVersionString + "/");
-				File exe = new File(bindir + latestVersionString + "/" + jarName);
+				File exe = new File(bindir + latestVersionString + "/" + jarName+"_TMP");
+				File exeFinal = new File(bindir + latestVersionString + "/" + jarName);
 
-				if (!folder.exists() || !exe.exists() || sizeOfJar != exe.length()) {
+				if (!folder.exists() || !exeFinal.exists() || sizeOfJar != exeFinal.length()) {
 					folder.mkdirs();
+					if(exe.exists())
+						exe.delete();
 					exe.createNewFile();
 					byte dataBuffer[] = new byte[1024];
 					int bytesRead;
@@ -129,8 +137,12 @@ public class CadoodleUpdater {
 					pis.close();
 
 				}
-				if (folder.exists() && exe.exists() && sizeOfJar == exe.length())
+
+				if(exe.exists())
+					Files.move(exe.toPath(), exeFinal.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				if (folder.exists() && exeFinal.exists() && sizeOfJar == exeFinal.length())
 					myVersionString = latestVersionString;
+
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -151,7 +163,7 @@ public class CadoodleUpdater {
 		new Thread(() -> {
 			String command;
 			try {
-				command = JvmManager.getCommandString(project, repoName, myVersionString,downloadJsonURL,sizeOfJson,progress,bindir);
+				command = JvmManager.getCommandString(project, repoName, myVersionString,downloadJsonURL,sizeOfJson,progress,bindir,infoBar);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -198,7 +210,22 @@ public class CadoodleUpdater {
 			System.out.println("Running:\n\n"+finalCommand+"\n\n");
 			new Thread(() -> {
 				try {
-					Process process = Runtime.getRuntime().exec(finalCommand);
+					// Get the current environment
+					Map<String, String> env = new HashMap<>(System.getenv());
+
+					// Extract JAVA_HOME from the JVM path
+					// Assuming your command starts with the full path to java executable
+					String javaHome = extractJavaHomeFromCommand(command);
+					if (javaHome != null) {
+					    env.put("JAVA_HOME", javaHome);
+					}
+
+					// Convert environment map to array format
+					String[] envArray = env.entrySet().stream()
+					    .map(entry -> entry.getKey() + "=" + entry.getValue())
+					    .toArray(String[]::new);
+					// Execute with modified environment
+					Process process = Runtime.getRuntime().exec(finalCommand, envArray);
 					Thread thread = new Thread(()->{
 						BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 						String line;
@@ -257,7 +284,31 @@ public class CadoodleUpdater {
 			}).start();
 		}).start();
 	}
-
+	private static String extractJavaHomeFromCommand(String command) {
+	    try {
+	        // Split the command to get the java executable path
+	        String[] parts = command.split(" ");
+	        if (parts.length > 0) {
+	            String javaPath = parts[0];
+	            
+	            // Remove quotes if present
+	            javaPath = javaPath.replace("\"", "");
+	            
+	            // Get the parent directory of the bin folder
+	            Path path = Paths.get(javaPath);
+	            if (path.getFileName().toString().startsWith("java")) {
+	                // Go up from java executable to bin, then to JAVA_HOME
+	                Path binDir = path.getParent();
+	                if (binDir != null && binDir.getFileName().toString().equals("bin")) {
+	                    return binDir.getParent().toString();
+	                }
+	            }
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Could not extract JAVA_HOME from command: " + e.getMessage());
+	    }
+	    return null;
+	}
 	public static boolean isWin() {
 		return System.getProperty("os.name").toLowerCase().contains("windows");
 	}

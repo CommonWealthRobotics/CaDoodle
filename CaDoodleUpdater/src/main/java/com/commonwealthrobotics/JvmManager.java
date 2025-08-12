@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -43,15 +44,18 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import javafx.application.Platform;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 
 public class JvmManager {
 	private static long timeSincePrint = System.currentTimeMillis();
+	private static Label infoBar;
 
 	public static String getCommandString(String project, String repo, String version, String downloadJsonURL,
-			long sizeOfJson, ProgressBar progress, String bindir) throws Exception {
+			long sizeOfJson, ProgressBar progress, String bindir, Label info) throws Exception {
 		if (version == null)
 			version = "0.0.6";
+		infoBar=info;
 		File exe;
 		File jvmArchive;
 		File dest;
@@ -87,7 +91,7 @@ public class JvmManager {
 						System.out.println("Failed the extract, erasing and re-downloading");
 						jvmArchive.delete();
 						ex.printStackTrace();
-						return getCommandString(project, repo, version, downloadJsonURL, sizeOfJson, progress, bindir);
+						return getCommandString(project, repo, version, downloadJsonURL, sizeOfJson, progress, bindir,info);
 					}
 				}
 				if (type.toLowerCase().contains("tar.gz")) {
@@ -146,6 +150,7 @@ public class JvmManager {
 	private static void unzip(File path, String dir) throws Exception {
 		String fileBaseName = FilenameUtils.getBaseName(path.getName().toString());
 		Path destFolderPath = new File(dir).toPath();
+		Platform.runLater(()->infoBar.setText("Inflating Java Runtime..."));
 
 		try (ZipFile zipFile = ZipFile.builder().setFile(path).get()) {
 			Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
@@ -187,6 +192,7 @@ public class JvmManager {
 
 	public static void untar(File tarFile, String dir) throws Exception {
 		System.out.println("Untaring " + tarFile.getName() + " into " + dir);
+		Platform.runLater(()->infoBar.setText("Inflating Java Runtime..."));
 
 		File dest = new File(dir);
 		dest.mkdir();
@@ -231,7 +237,9 @@ public class JvmManager {
 	private static File download(String version, String downloadJsonURL, long sizeOfJson, ProgressBar progress,
 			String bindir, String filename) throws MalformedURLException, IOException, FileNotFoundException {
 		File folder = new File(bindir + version + "/");
-		File exe = new File(bindir + version + "/" + filename);
+		File exe = new File(bindir + version + "/" + filename+"_TMP");
+		File exeFinal = new File(bindir + version + "/" + filename);
+
 		try {
 			URL url = new URL(downloadJsonURL);
 			URLConnection connection = url.openConnection();
@@ -252,8 +260,11 @@ public class JvmManager {
 				}
 			});
 
-			if (!folder.exists() || !exe.exists()) {
+			if (!folder.exists() || !exeFinal.exists()) {
+				if(exe.exists())
+					exe.delete();
 				System.out.println("Start Downloading " + filename);
+				Platform.runLater(()->infoBar.setText("Downloading Java Runtime..."));
 				folder.mkdirs();
 				exe.createNewFile();
 				byte dataBuffer[] = new byte[1024];
@@ -271,7 +282,10 @@ public class JvmManager {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		System.out.println("Using JVM " + exe.getAbsolutePath());
-		return exe;
+		System.out.println("Using JVM " + exeFinal.getAbsolutePath());
+		if(exe.exists())
+			Files.move(exe.toPath(), exeFinal.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		return exeFinal;
 	}
+	
 }
