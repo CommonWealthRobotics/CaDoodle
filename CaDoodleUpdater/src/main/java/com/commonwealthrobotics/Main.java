@@ -16,7 +16,7 @@ public class Main  extends Application {
 		CadoodleUpdater.stage=stage;
 		Parent root = FXMLLoader.load(Main.class.getResource("ui.fxml"));
 
-		Scene scene = new Scene(root, 600, 523);
+		Scene scene = new Scene(root, 620, 658);
 
 		
 		stage.setScene(scene);

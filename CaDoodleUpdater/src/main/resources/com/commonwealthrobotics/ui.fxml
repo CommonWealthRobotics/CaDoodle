@@ -19,8 +19,8 @@
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints maxHeight="384.0" minHeight="10.0" prefHeight="329.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="331.0" minHeight="10.0" prefHeight="88.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="426.0" minHeight="10.0" prefHeight="426.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="331.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="331.0" minHeight="10.0" prefHeight="88.0" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="165.0" minHeight="10.0" prefHeight="82.0" vgrow="SOMETIMES" />
         </rowConstraints>
@@ -66,9 +66,9 @@
               </columnConstraints>
               <rowConstraints>
                   <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="117.0" minHeight="10.0" prefHeight="117.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="39.0" minHeight="10.0" prefHeight="37.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Label text="A new version is availible!" GridPane.rowIndex="1">
