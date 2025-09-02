@@ -152,6 +152,7 @@ jobs:
             CaDoodle-Linux-arm64.deb
             CaDoodle-Linux-x86_64.AppImage
             CaDoodle-Linux-x86_64.deb
+            CaDoodle-Windows-System-x86_64.exe
             CaDoodle-Windows-x86_64.exe
             CaDoodle-Windows-x86_64.zip
             CaDoodle-MacOS-x86_64.dmg

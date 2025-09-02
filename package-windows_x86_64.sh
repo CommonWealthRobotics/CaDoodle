@@ -83,9 +83,24 @@ echo "Building system wide installer"
   --win-dir-chooser \
   --win-per-user-install \
   --java-options '--enable-preview'
+  
+"$PACKAGE" --input "$INPUT_DIR/" \
+  --name "$NAME"-System \
+  --main-jar "$JAR_NAME" \
+  --main-class "$MAIN" \
+  --type "exe" \
+  --temp "temp2" \
+  --app-version "$VERSION" \
+  --icon "$ICON" \
+  --win-shortcut \
+  --win-menu \
+  --win-dir-chooser \
+  --java-options '--enable-preview'
+
 ls -al
 rm -rf release
 mkdir release
 export ARCH=x86_64
 cp $NAME-$VERSION.exe release/$NAME-Windows-$ARCH.exe
+cp $NAME-System-$VERSION.exe release/$NAME-Windows-System-$ARCH.exe
 cp $NAME-$VERSION.zip release/$NAME-Windows-$ARCH.zip

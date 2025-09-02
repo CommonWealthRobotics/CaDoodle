@@ -23,3 +23,23 @@ This repository is the installer and auto-updater. The installable releases are 
 The below link is for the source code of the main application itself.
 
 https://github.com/CommonWealthRobotics/CaDoodle-Application
+
+# Windows install
+
+For silent local installs
+
+```
+
+CaDoodle-Windows-x86_64.exe /S 
+
+```
+
+For silent system installs
+
+```
+
+CaDoodle-Windows-System-x86_64.exe /S 
+
+CaDoodle-Windows-System-x86_64.exe /S /D=D:\CustomLocation\CaDoodle\
+
+```
