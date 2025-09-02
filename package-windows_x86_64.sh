@@ -68,7 +68,7 @@ rm -rf $NAME
 echo "Zipping standalone version"
 rm -rf *.zip
 7z a $NAME-$VERSION.zip "$NAME/"
-echo "Building system wide installer" 
+echo "Building Local installer" 
 
 "$PACKAGE" --input "$INPUT_DIR/" \
   --name "$NAME" \
@@ -83,13 +83,15 @@ echo "Building system wide installer"
   --win-dir-chooser \
   --win-per-user-install \
   --java-options '--enable-preview'
+
+echo "Building system wide installer" 
   
 "$PACKAGE" --input "$INPUT_DIR/" \
   --name "$NAME"-System \
   --main-jar "$JAR_NAME" \
   --main-class "$MAIN" \
   --type "exe" \
-  --temp "temp2" \
+  --temp "temp3" \
   --app-version "$VERSION" \
   --icon "$ICON" \
   --win-shortcut \
