@@ -27,7 +27,7 @@ else
 	7z x $ZIP -o"$JAVA_HOME"
 	mv "$JAVA_HOME/$JVM/"* "$JAVA_HOME/"
 fi
-echo "Compile wiht gradle"
+echo "Compile with gradle"
 ./gradlew shadowJar
 echo "Test jar in: $SCRIPT_DIR"
 DIR="$SCRIPT_DIR/CaDoodleUpdater/build/libs/"
@@ -37,12 +37,12 @@ JAR_NAME=CaDoodleUpdater.jar
 echo "Test jar complete"
 
 ICON=$NAME.ico
-magick convert SourceIcon.png -resize 256x256 your_image_256.png
-magick convert SourceIcon.png -resize 128x128 your_image_128.png
-magick convert SourceIcon.png -resize 64x64 your_image_64.png
-magick convert SourceIcon.png -resize 48x48 your_image_48.png
-magick convert SourceIcon.png -resize 32x32 your_image_32.png
-magick convert SourceIcon.png -resize 16x16 your_image_16.png
+magick SourceIcon.png -resize 256x256 your_image_256.png
+magick SourceIcon.png -resize 128x128 your_image_128.png
+magick SourceIcon.png -resize 64x64 your_image_64.png
+magick SourceIcon.png -resize 48x48 your_image_48.png
+magick SourceIcon.png -resize 32x32 your_image_32.png
+magick SourceIcon.png -resize 16x16 your_image_16.png
 
 magick convert your_image_16.png your_image_32.png your_image_48.png your_image_64.png your_image_128.png your_image_256.png $NAME.ico 
     
@@ -63,7 +63,7 @@ rm -rf $NAME
   --temp "temp1"  \
   --app-version "$VERSION" \
   --icon "$ICON" \
-  --java-options '--enable-preview'
+  --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
   
 echo "Zipping standalone version"
 rm -rf *.zip
@@ -82,7 +82,7 @@ echo "Building Local installer"
   --win-menu \
   --win-dir-chooser \
   --win-per-user-install \
-  --java-options '--enable-preview'
+  --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
 
 echo "Building system wide installer" 
   
@@ -97,7 +97,7 @@ echo "Building system wide installer"
   --win-shortcut \
   --win-menu \
   --win-dir-chooser \
-  --java-options '--enable-preview'
+  --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
 
 ls -al
 rm -rf release

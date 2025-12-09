@@ -14,10 +14,10 @@ ARCH=x86_64
 JVM=zulu17.50.19-ca-fx-jdk17.0.11-macosx_x64
 if [[ $(uname -m) == 'arm64' ]]; then
   ARCH=arm64
-  echo "M1 Mac detected https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-macosx_aarch64.tar.gz" 
+  echo "M1 Mac detected https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-macosx_aarch64.tar.gz"
   JVM=zulu17.50.19-ca-fx-jdk17.0.11-macosx_aarch64
 else
-  echo "x86 Mac detected https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-macosx_x64.tar.gz" 
+  echo "x86 Mac detected https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-macosx_x64.tar.gz"
 
 fi
 set -e
@@ -45,7 +45,7 @@ ICON=$NAME.png
 cp SourceIcon.png $ICON
 rm -rf $SCRIPT_DIR/$NAME
 rm -rf $SCRIPT_DIR/$NAME.AppDir
-BUILDDIR=CaDoodleUpdater/build/libs/ 
+BUILDDIR=CaDoodleUpdater/build/libs/
 TARGETJAR=CaDoodleUpdater.jar
 rm -rf *.dmg
 echo "Building DMG..."
@@ -73,7 +73,7 @@ $JAVA_HOME/bin/jpackage --input $BUILDDIR \
   --vendor "Common Wealth Robotics" \
   --icon $NAME.icns \
   --app-version "$VERSION" \
-  --java-options '--enable-preview'
+  --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
 ls -al
 rm -rf release
 mkdir release
