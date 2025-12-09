@@ -44,7 +44,7 @@ magick SourceIcon.png -resize 48x48 your_image_48.png
 magick SourceIcon.png -resize 32x32 your_image_32.png
 magick SourceIcon.png -resize 16x16 your_image_16.png
 
-magick convert your_image_16.png your_image_32.png your_image_48.png your_image_64.png your_image_128.png your_image_256.png $NAME.ico 
+magick your_image_16.png your_image_32.png your_image_48.png your_image_64.png your_image_128.png your_image_256.png $NAME.ico 
     
 PACKAGE="$JAVA_HOME/bin/jpackage.exe"
 mkdir -p "$INPUT_DIR"
