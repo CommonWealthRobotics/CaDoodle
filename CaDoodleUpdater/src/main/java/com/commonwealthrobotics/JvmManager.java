@@ -71,16 +71,24 @@ public class JvmManager {
 			HashMap<String, Object> database = gson.fromJson(jsonText, TT_mapStringString);
 			String key = "UNKNOWN";
 			key = discoverKey(key);
-			Map<String, Object> vm = (Map<String, Object>) database.get(key);
+			Object rawKey = database.get(key);          // raw lookup
+			if (!(rawKey instanceof Map))
+				throw new IllegalStateException("Entry for key '" + key + "' is not a Map");
+			@SuppressWarnings("unchecked")
+			Map<String, Object> vm = (Map<String, Object>) rawKey;
+
 			String baseURL = vm.get("url").toString();
 			String type = vm.get("type").toString();
 			String name = vm.get("name").toString();
 			List<String> jvmargs = null;
 			Object o = vm.get("jvmargs");
-			if (o != null)
-				jvmargs = (List<String>) o;
-			else
+			if (o instanceof List) {
+				@SuppressWarnings("unchecked")
+				List<String> tmp = (List<String>) o;
+				jvmargs = tmp;
+			} else
 				jvmargs = new ArrayList<String>();
+
 			String jvmURL = baseURL + name + "." + type;
 			jvmArchive = download("", jvmURL, 300000000, progress, bindir, name + "." + type);
 			dest = new File(bindir + name);
@@ -179,7 +187,7 @@ public class JvmManager {
 								ex.printStackTrace();
 							}
 							try (OutputStream out = new FileOutputStream(entryPath.toFile())) {
-								IOUtils.copy(in, out);
+								in.transferTo(out);
 							}
 							if (isExecutable(entry)) {
 								entryPath.toFile().setExecutable(true);
@@ -205,7 +213,7 @@ public class JvmManager {
 			tarFile.delete();
 			return;
 		}
-		TarArchiveEntry tarEntry = tarIn.getNextTarEntry();
+		TarArchiveEntry tarEntry = tarIn.getNextEntry();
 		// tarIn is a TarArchiveInputStream
 		while (tarEntry != null) {// create a file with the same name as the tarEntry
 			File destPath = new File(dest.toString() + System.getProperty("file.separator") + tarEntry.getName());
@@ -226,7 +234,7 @@ public class JvmManager {
 					destPath.setExecutable(true);
 				}
 			}
-			tarEntry = tarIn.getNextTarEntry();
+			tarEntry = tarIn.getNextEntry();
 		}
 		tarIn.close();
 	}

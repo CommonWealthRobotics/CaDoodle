@@ -4,7 +4,7 @@ NAME=CaDoodle
 VERSION=0.0.1
 MAIN=com.commonwealthrobotics.Main
 
-sudo apt install fuse 
+sudo apt install fuse
 
 if [[ -z "${VERSION_SEMVER}" ]]; then
   VERSION=4.0.4
@@ -24,7 +24,7 @@ if test -d $JAVA_HOME/$JVM/; then
 else
 	rm -rf $JAVA_HOME
 	mkdir -p $JAVA_HOME
-	wget https://cdn.azul.com/zulu/bin/$ZIP 
+	wget https://cdn.azul.com/zulu/bin/$ZIP
 	tar -xvzf $ZIP -C $JAVA_HOME
 	mv $JAVA_HOME/$JVM/* $JAVA_HOME/
 fi
@@ -38,13 +38,11 @@ JAR_NAME=CaDoodleUpdater.jar
 echo "Test jar complete"
 ls -al $JAVA_HOME
 
-
-
 ICON=$NAME.png
 cp SourceIcon.png $ICON
 rm -rf $SCRIPT_DIR/$NAME
 rm -rf $SCRIPT_DIR/$NAME.AppDir
-BUILDDIR=CaDoodleUpdater/build/libs/ 
+BUILDDIR=CaDoodleUpdater/build/libs/
 TARGETJAR=CaDoodleUpdater.jar
 
 $JAVA_HOME/bin/jpackage --input $BUILDDIR \
@@ -53,8 +51,8 @@ $JAVA_HOME/bin/jpackage --input $BUILDDIR \
   --main-class $MAIN \
   --type app-image \
   --app-version $VERSION \
-  --java-options '--enable-preview'
- 
+  --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false -Djava.security.egd=file:/dev/./urandom'
+
 mkdir -p $SCRIPT_DIR/$NAME.AppDir/usr/
 cp -r $SCRIPT_DIR/$NAME/* $SCRIPT_DIR/$NAME.AppDir/usr/
 
@@ -70,7 +68,6 @@ Type=Application
 Categories=Utility
 EOF
 
- 
 chmod 644 $NAME.AppDir/$NAME.desktop
 
 ln -s usr/bin/$NAME  $SCRIPT_DIR/$NAME.AppDir/AppRun
@@ -106,8 +103,9 @@ $JAVA_HOME/bin/jpackage --input $BUILDDIR \
   --icon $ICON \
   --copyright "Creative Commons" \
   --vendor CommonWealthRobotics \
- --linux-menu-group "Education;Graphics;Development;" \
-  --java-options '--enable-preview'
+  --linux-menu-group "Education;Graphics;Development;" \
+  --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false -Djava.security.egd=file:/dev/./urandom'
+
 echo "Deb built!"
 ls -al
 rm -rf release
