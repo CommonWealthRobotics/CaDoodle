@@ -61,6 +61,7 @@ public class JvmManager {
 		File dest;
 		try {
 			exe = download(version, downloadJsonURL, sizeOfJson, progress, bindir, "jvm.json");
+			download(version, downloadJsonURL, sizeOfJson, progress, bindir, "gitcache.zip");
 			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {
 			}.getType();
 			// chreat the gson object, this is the parsing factory
