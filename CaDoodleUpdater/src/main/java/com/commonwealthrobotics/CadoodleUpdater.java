@@ -49,6 +49,7 @@ public class CadoodleUpdater {
 	public static String myVersionString = null;
 	public static long sizeOfJar = 0;
 	public static long sizeOfJson = 0;
+	public static long sizeOfZip = 0;
 	@FXML // ResourceBundle that was given to the FXMLLoader
 	private ResourceBundle resources;
 
@@ -84,6 +85,7 @@ public class CadoodleUpdater {
 
 	private static String downloadJarURL;
 	private static String downloadJsonURL;
+	private static String downloadZip;
 	
 	public static String repoName;
 	public static String jarName;
@@ -163,7 +165,7 @@ public class CadoodleUpdater {
 		new Thread(() -> {
 			String command;
 			try {
-				command = JvmManager.getCommandString(project, repoName, myVersionString,downloadJsonURL,sizeOfJson,progress,bindir,infoBar);
+				command = JvmManager.getCommandString(project, repoName, myVersionString,downloadJsonURL, downloadZip,sizeOfZip,sizeOfJson,progress,bindir,infoBar);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -361,6 +363,10 @@ public class CadoodleUpdater {
 					downloadJsonURL = (String) key.get("browser_download_url");
 					sizeOfJson = ((Double) key.get("size")).longValue();
 					System.out.println(downloadJsonURL + " Size " + sizeOfJson + " bytes");
+				}if (string.contentEquals("gitcache.zip")) {
+					downloadZip = (String) key.get("browser_download_url");
+					sizeOfZip = ((Double) key.get("size")).longValue();
+					System.out.println(downloadZip + " Size " + sizeOfZip + " bytes");
 				}else
 					System.out.println(string+" is not jvm.json");
 				

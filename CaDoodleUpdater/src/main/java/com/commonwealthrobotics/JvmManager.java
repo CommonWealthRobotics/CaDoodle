@@ -52,7 +52,7 @@ public class JvmManager {
 	private static Label infoBar;
 
 	public static String getCommandString(String project, String repo, String version, String downloadJsonURL,
-			long sizeOfJson, ProgressBar progress, String bindir, Label info) throws Exception {
+			String downloadZip, long sizeOfZip, long sizeOfJson, ProgressBar progress, String bindir, Label info) throws Exception {
 		if (version == null)
 			version = "0.0.6";
 		infoBar=info;
@@ -61,7 +61,7 @@ public class JvmManager {
 		File dest;
 		try {
 			exe = download(version, downloadJsonURL, sizeOfJson, progress, bindir, "jvm.json");
-			download(version, downloadJsonURL, sizeOfJson, progress, bindir, "gitcache.zip");
+			download(version, downloadZip, sizeOfZip, progress, bindir, "gitcache.zip");
 			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {
 			}.getType();
 			// chreat the gson object, this is the parsing factory
@@ -100,7 +100,7 @@ public class JvmManager {
 						System.out.println("Failed the extract, erasing and re-downloading");
 						jvmArchive.delete();
 						ex.printStackTrace();
-						return getCommandString(project, repo, version, downloadJsonURL, sizeOfJson, progress, bindir,info);
+						return getCommandString(project, repo, version, downloadJsonURL, downloadZip,  sizeOfZip, sizeOfJson, progress, bindir,info);
 					}
 				}
 				if (type.toLowerCase().contains("tar.gz")) {
