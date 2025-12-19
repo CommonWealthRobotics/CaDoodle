@@ -56,3 +56,27 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 application {
 	mainClass = 'com.commonwealthrobotics.Main'
 }
+
+// Create dependencies structure
+startScripts.dependsOn shadowJar
+startShadowScripts.dependsOn jar
+startShadowScripts.dependsOn shadowJar
+
+// Point the run/start scripts to the fat jar
+application {
+	mainClass = 'com.commonwealthrobotics.Main'
+	applicationDefaultJvmArgs = []
+	applicationDistribution.from(shadowJar) {
+		into 'lib'
+	}
+}
+
+// Use only the fat Jar
+distributions {
+	main {
+		contents {
+			exclude { f -> f.name.equals('CaDoodleUpdater.jar') && !f.name.contains('shadow') }
+			from shadowJar
+		}
+	}
+}
