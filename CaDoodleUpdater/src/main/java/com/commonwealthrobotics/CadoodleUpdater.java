@@ -16,6 +16,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.stage.Stage;
+
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -196,7 +198,7 @@ public class CadoodleUpdater {
 				writer = new BufferedWriter(new FileWriter(myVersionFileString));
 				writer.write(myVersionString);
 				writer.close();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -386,24 +388,30 @@ public class CadoodleUpdater {
 		assert previousVersion != null : "fx:id=\"previousVersion\" was not injected: check your FXML file 'ui.fxml'.";
 		assert currentVersion != null : "fx:id=\"currentVersion\" was not injected: check your FXML file 'ui.fxml'.";
 		boolean noInternet = false;
-		try {
-			readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases/latest");
-			binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " Mb");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			noInternet=true;
-		}
-		stage.setTitle("Auto-Updater for " + repoName);
-		currentVersion.setText(latestVersionString);
 		bindir = System.getProperty("user.home") + "/bin/" + repoName + "Install/";
 		myVersionFileString = bindir + "currentversion.txt";
+		String pinFileName = bindir + "pinVersion";
+		File pinFile = new File(pinFileName);
+		if(pinFile.exists()) {
+			noInternet=true;
+		}
+		if(!noInternet)
+			try {
+				readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases/latest");
+				binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " Mb");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				noInternet=true;
+			}
+		stage.setTitle("Auto-Updater for " + repoName);
+		currentVersion.setText(latestVersionString);
 		myVersionFile = new File(myVersionFileString);
 		bindirFile = new File(bindir);
 		if (!bindirFile.exists())
 			bindirFile.mkdirs();
-		if (!myVersionFile.exists()) {
 
+		if (!myVersionFile.exists()) {
 			onYes(null);
 			return;
 		} else {
@@ -428,10 +436,10 @@ public class CadoodleUpdater {
 					launchApplication();
 					return;
 				}
-		}else {
+		}
+		if(noInternet) {
 			onNo(null);
 			return;
 		}
-
 	}
 }

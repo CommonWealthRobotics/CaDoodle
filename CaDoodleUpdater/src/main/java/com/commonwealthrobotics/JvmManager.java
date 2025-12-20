@@ -52,10 +52,13 @@ public class JvmManager {
 	private static Label infoBar;
 
 	public static String getCommandString(String project, String repo, String version, String downloadJsonURL,
-			String downloadZip, long sizeOfZip, long sizeOfJson, ProgressBar progress, String bindir, Label info) throws Exception {
+			String downloadZip, long sizeOfZip, long sizeOfJson, ProgressBar progress, String bindir, Label info)
+			throws Exception {
 		if (version == null)
 			version = "0.0.6";
-		infoBar=info;
+		if (bindir == null)
+			throw new RuntimeException("Can not launch without bindir");
+		infoBar = info;
 		File exe;
 		File jvmArchive;
 		File dest;
@@ -71,7 +74,7 @@ public class JvmManager {
 			HashMap<String, Object> database = gson.fromJson(jsonText, TT_mapStringString);
 			String key = "UNKNOWN";
 			key = discoverKey(key);
-			Object rawKey = database.get(key);          // raw lookup
+			Object rawKey = database.get(key); // raw lookup
 			if (!(rawKey instanceof Map))
 				throw new IllegalStateException("Entry for key '" + key + "' is not a Map");
 			@SuppressWarnings("unchecked")
@@ -100,7 +103,8 @@ public class JvmManager {
 						System.out.println("Failed the extract, erasing and re-downloading");
 						jvmArchive.delete();
 						ex.printStackTrace();
-						return getCommandString(project, repo, version, downloadJsonURL, downloadZip,  sizeOfZip, sizeOfJson, progress, bindir,info);
+						return getCommandString(project, repo, version, downloadJsonURL, downloadZip, sizeOfZip,
+								sizeOfJson, progress, bindir, info);
 					}
 				}
 				if (type.toLowerCase().contains("tar.gz")) {
@@ -159,7 +163,7 @@ public class JvmManager {
 	private static void unzip(File path, String dir) throws Exception {
 		String fileBaseName = FilenameUtils.getBaseName(path.getName().toString());
 		Path destFolderPath = new File(dir).toPath();
-		Platform.runLater(()->infoBar.setText("Inflating Java Runtime..."));
+		Platform.runLater(() -> infoBar.setText("Inflating Java Runtime..."));
 
 		try (ZipFile zipFile = ZipFile.builder().setFile(path).get()) {
 			Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
@@ -201,7 +205,7 @@ public class JvmManager {
 
 	public static void untar(File tarFile, String dir) throws Exception {
 		System.out.println("Untaring " + tarFile.getName() + " into " + dir);
-		Platform.runLater(()->infoBar.setText("Inflating Java Runtime..."));
+		Platform.runLater(() -> infoBar.setText("Inflating Java Runtime..."));
 
 		File dest = new File(dir);
 		dest.mkdir();
@@ -246,55 +250,56 @@ public class JvmManager {
 	private static File download(String version, String downloadJsonURL, long sizeOfJson, ProgressBar progress,
 			String bindir, String filename) throws MalformedURLException, IOException, FileNotFoundException {
 		File folder = new File(bindir + version + "/");
-		File exe = new File(bindir + version + "/" + filename+"_TMP");
+		File exe = new File(bindir + version + "/" + filename + "_TMP");
 		File exeFinal = new File(bindir + version + "/" + filename);
+		if (downloadJsonURL != null) {
+			try {
+				URL url = new URL(downloadJsonURL);
+				URLConnection connection = url.openConnection();
+				InputStream is = connection.getInputStream();
+				ProcessInputStream pis = new ProcessInputStream(is, (int) sizeOfJson);
+				pis.addListener(new Listener() {
+					@Override
+					public void process(double percent) {
+						if (System.currentTimeMillis() - timeSincePrint > 1000) {
+							timeSincePrint = System.currentTimeMillis();
+							System.out.println("Download " + filename + " percent " + percent);
 
-		try {
-			URL url = new URL(downloadJsonURL);
-			URLConnection connection = url.openConnection();
-			InputStream is = connection.getInputStream();
-			ProcessInputStream pis = new ProcessInputStream(is, (int) sizeOfJson);
-			pis.addListener(new Listener() {
-				@Override
-				public void process(double percent) {
-					if(System.currentTimeMillis()-timeSincePrint>1000) {
-						timeSincePrint=System.currentTimeMillis();
-						 System.out.println("Download " + filename + " percent " + percent);
-
+						}
+						Platform.runLater(() -> {
+							if (percent < 100)
+								progress.setProgress(percent);
+						});
 					}
-					Platform.runLater(() -> {
-						if(percent<100)
-							progress.setProgress(percent);
-					});
-				}
-			});
+				});
 
-			if (!folder.exists() || !exeFinal.exists()) {
-				if(exe.exists())
-					exe.delete();
-				System.out.println("Start Downloading " + filename);
-				Platform.runLater(()->infoBar.setText("Downloading Java Runtime..."));
-				folder.mkdirs();
-				exe.createNewFile();
-				byte dataBuffer[] = new byte[1024];
-				int bytesRead;
-				FileOutputStream fileOutputStream = new FileOutputStream(exe.getAbsoluteFile());
-				while ((bytesRead = pis.read(dataBuffer, 0, 1024)) != -1) {
-					fileOutputStream.write(dataBuffer, 0, bytesRead);
+				if (!folder.exists() || !exeFinal.exists()) {
+					if (exe.exists())
+						exe.delete();
+					System.out.println("Start Downloading " + filename);
+					Platform.runLater(() -> infoBar.setText("Downloading Java Runtime..."));
+					folder.mkdirs();
+					exe.createNewFile();
+					byte dataBuffer[] = new byte[1024];
+					int bytesRead;
+					FileOutputStream fileOutputStream = new FileOutputStream(exe.getAbsoluteFile());
+					while ((bytesRead = pis.read(dataBuffer, 0, 1024)) != -1) {
+						fileOutputStream.write(dataBuffer, 0, bytesRead);
+					}
+					fileOutputStream.close();
+					pis.close();
+					System.out.println("Finished downloading " + filename);
+				} else {
+					System.out.println("Not downloadeing, it existst " + filename);
 				}
-				fileOutputStream.close();
-				pis.close();
-				System.out.println("Finished downloading " + filename);
-			} else {
-				System.out.println("Not downloadeing, it existst " + filename);
+			} catch (Throwable t) {
+				t.printStackTrace();
 			}
-		} catch (Throwable t) {
-			t.printStackTrace();
 		}
 		System.out.println("Using JVM " + exeFinal.getAbsolutePath());
-		if(exe.exists())
+		if (exe.exists())
 			Files.move(exe.toPath(), exeFinal.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		return exeFinal;
 	}
-	
+
 }
