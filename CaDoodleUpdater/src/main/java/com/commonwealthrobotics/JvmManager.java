@@ -53,15 +53,16 @@ public class JvmManager {
 	private static Label infoBar;
 
 	public static String getCommandString(String project, String repo, String version, String downloadJsonURL,
-		String downloadZip, long sizeOfZip, long sizeOfJson, ProgressBar progressBar, Label progressLabel, String bindir, Label info)
-		throws Exception {
+			String downloadZip, long sizeOfZip, long sizeOfJson, ProgressBar progressBar, Label progressLabel,
+			String bindir, Label info) throws Exception {
 
 		if (version == null)
 			version = "0.0.6";
 
 		if (bindir == null)
 			throw new RuntimeException("Can not launch without bindir");
-
+//		if(downloadJsonURL==null)
+//			throw new RuntimeException("Can not launch without url "+downloadJsonURL);
 		infoBar = info;
 		File exe;
 		File jvmArchive;
@@ -69,7 +70,8 @@ public class JvmManager {
 		try {
 			exe = download(version, downloadJsonURL, progressBar, progressLabel, bindir, "jvm.json");
 			download(version, downloadZip, progressBar, progressLabel, bindir, "gitcache.zip");
-			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() { }.getType();
+			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {
+			}.getType();
 			// create the gson object, this is the parsing factory
 			Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 			String jsonText = Files.readString(exe.toPath());
@@ -255,9 +257,9 @@ public class JvmManager {
 
 	public static long getRemoteSize(String url) throws IOException {
 		HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
-		c.setRequestMethod("HEAD");		  // <-- important
+		c.setRequestMethod("HEAD"); // <-- important
 		c.setConnectTimeout(5_000);
-		c.setReadTimeout (5_000);
+		c.setReadTimeout(5_000);
 		c.connect();
 
 		String len = c.getHeaderField("Content-Length");
@@ -266,20 +268,20 @@ public class JvmManager {
 		return len == null || len.isEmpty() ? -1L : Long.parseLong(len);
 	}
 
-	private static File download(String version, String downloadURL, ProgressBar progressBar, Label progressLabel, String bindir, String filename)
-		throws MalformedURLException, IOException, FileNotFoundException {
+	private static File download(String version, String downloadURL, ProgressBar progressBar, Label progressLabel,
+			String bindir, String filename) throws MalformedURLException, IOException, FileNotFoundException {
 		File exeFinal = null;
-		long sizeOfJson = getRemoteSize(downloadURL);
-		if (sizeOfJson == 0)
-			System.out.printf("Failed to get filesize of: %s %n", downloadURL);
-		else
-		{
-			System.out.printf("Downloading %s %n", downloadURL);
-			File folder = new File(bindir + version + "/");
-			File exe = new File(bindir + version + "/" + filename + "_TMP");
-			exeFinal = new File(bindir + version + "/" + filename);
 
-			if (downloadURL != null) {
+		System.out.printf("Downloading %s %n", downloadURL);
+		File folder = new File(bindir + version + "/");
+		File exe = new File(bindir + version + "/" + filename + "_TMP");
+		exeFinal = new File(bindir + version + "/" + filename);
+
+		if (downloadURL != null) {
+			long sizeOfJson = getRemoteSize(downloadURL);
+			if (sizeOfJson == 0)
+				System.out.printf("Failed to get filesize of: %s %n", downloadURL);
+			else
 				try {
 					URL url = new URL(downloadURL);
 					URLConnection connection = url.openConnection();
@@ -305,7 +307,7 @@ public class JvmManager {
 						if (exe.exists())
 							exe.delete();
 						System.out.println("Start Downloading " + filename);
-						Platform.runLater(()->infoBar.setText("Downloading " + filename));
+						Platform.runLater(() -> infoBar.setText("Downloading " + filename));
 						folder.mkdirs();
 						exe.createNewFile();
 						int dataBufferSize = 16 * 1024;
@@ -325,11 +327,11 @@ public class JvmManager {
 				} catch (Throwable t) {
 					t.printStackTrace();
 				}
-			}
-			System.out.println("Using JVM " + exeFinal.getAbsolutePath());
-			if (exe.exists())
-				Files.move(exe.toPath(), exeFinal.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		}
+		System.out.println("Using JVM " + exeFinal.getAbsolutePath());
+		if (exe.exists())
+			Files.move(exe.toPath(), exeFinal.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
 		return exeFinal;
 	}
 }
