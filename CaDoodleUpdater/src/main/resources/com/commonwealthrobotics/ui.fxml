@@ -29,7 +29,7 @@
             <AnchorPane prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="3">
                <children>
                   <ProgressBar fx:id="progressBar" progress="0.0" disable="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0" />
-                  <Label fx:id="progressLabel" alignment="CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <Label fx:id="progressLabel" alignment="CENTER" style="-fx-text-fill: black; -fx-effect: dropshadow(gaussian, white, 2, 0.5, 1, 1);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <font>
                         <Font size="20.0" />
                      </font>
@@ -47,7 +47,7 @@
                <children>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-padding: 0 2 2 2;">
                      <children>
-                        <Button fx:id="yesButton" mnemonicParsing="false" onAction="#onYes" text="Download" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Button fx:id="yesButton" mnemonicParsing="false" onAction="#onYes" text="Update please!" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <styleClass>
                               <String fx:value="image-button-focus" />
                               <String fx:value="image-button" />
@@ -59,7 +59,7 @@
                   </AnchorPane>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1"  style="-fx-padding: 0 2 2 2;">
                      <children>
-                        <Button fx:id="noButton" mnemonicParsing="false" onAction="#onNo" text="Skip for now" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Button fx:id="noButton" mnemonicParsing="false" onAction="#onNo" text="Keep it the way it was" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <styleClass>
                               <String fx:value="image-button" />
                               <String fx:value="image-button-focus" />
