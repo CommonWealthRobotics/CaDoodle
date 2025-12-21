@@ -4,6 +4,7 @@
 package com.commonwealthrobotics;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,7 +18,10 @@ public class Main  extends Application {
 		Parent root = FXMLLoader.load(Main.class.getResource("ui.fxml"));
 
 		Scene scene = new Scene(root, 620, 658);
-
+		stage.setOnCloseRequest(event -> {
+			Platform.exit();
+			System.exit(0);
+		});
 		
 		stage.setScene(scene);
 		stage.show();
