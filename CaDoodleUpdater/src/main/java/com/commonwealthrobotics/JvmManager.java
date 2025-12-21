@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -52,22 +53,24 @@ public class JvmManager {
 	private static Label infoBar;
 
 	public static String getCommandString(String project, String repo, String version, String downloadJsonURL,
-			String downloadZip, long sizeOfZip, long sizeOfJson, ProgressBar progress, String bindir, Label info)
-			throws Exception {
+		String downloadZip, long sizeOfZip, long sizeOfJson, ProgressBar progressBar, Label progressLabel, String bindir, Label info)
+		throws Exception {
+
 		if (version == null)
 			version = "0.0.6";
+
 		if (bindir == null)
 			throw new RuntimeException("Can not launch without bindir");
+
 		infoBar = info;
 		File exe;
 		File jvmArchive;
 		File dest;
 		try {
-			exe = download(version, downloadJsonURL, sizeOfJson, progress, bindir, "jvm.json");
-			download(version, downloadZip, sizeOfZip, progress, bindir, "gitcache.zip");
-			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {
-			}.getType();
-			// chreat the gson object, this is the parsing factory
+			exe = download(version, downloadJsonURL, progressBar, progressLabel, bindir, "jvm.json");
+			download(version, downloadZip, progressBar, progressLabel, bindir, "gitcache.zip");
+			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() { }.getType();
+			// create the gson object, this is the parsing factory
 			Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 			String jsonText = Files.readString(exe.toPath());
 
@@ -85,6 +88,7 @@ public class JvmManager {
 			String name = vm.get("name").toString();
 			List<String> jvmargs = null;
 			Object o = vm.get("jvmargs");
+			System.out.println("jvmargs: " + jvmargs);
 			if (o instanceof List) {
 				@SuppressWarnings("unchecked")
 				List<String> tmp = (List<String>) o;
@@ -93,34 +97,35 @@ public class JvmManager {
 				jvmargs = new ArrayList<String>();
 
 			String jvmURL = baseURL + name + "." + type;
-			jvmArchive = download("", jvmURL, 300000000, progress, bindir, name + "." + type);
+			jvmArchive = download("", jvmURL, progressBar, progressLabel, bindir, name + "." + type);
 			dest = new File(bindir + name);
 			if (!dest.exists()) {
 				if (type.toLowerCase().contains("zip")) {
 					try {
 						unzip(jvmArchive, bindir);
 					} catch (java.util.zip.ZipException ex) {
-						System.out.println("Failed the extract, erasing and re-downloading");
+						System.out.println("Failed to extract, erasing and re-downloading");
 						jvmArchive.delete();
 						ex.printStackTrace();
 						return getCommandString(project, repo, version, downloadJsonURL, downloadZip, sizeOfZip,
-								sizeOfJson, progress, bindir, info);
+								sizeOfJson, progressBar, progressLabel, bindir, info);
 					}
 				}
 				if (type.toLowerCase().contains("tar.gz")) {
 					untar(jvmArchive, bindir);
 				}
 			} else {
-				System.out.println("Not extraction, VM exists " + dest.getAbsolutePath());
+				System.out.println("Not extracting, VM exists " + dest.getAbsolutePath());
 			}
 			String cmd = bindir + name + "/bin/java" + (CadoodleUpdater.isWin() ? ".exe" : "") + " ";
 			for (String s : jvmargs) {
 				cmd += s + " ";
 			}
+			System.err.println("Command line: " + cmd); // IRON
 			return cmd + " -jar ";
 		} catch (java.io.EOFException ex) {
 			ex.printStackTrace();
-			System.err.println("JVM is currupted");
+			System.err.println("JVM is corrupted");
 			System.exit(1);
 		}
 		return null;
@@ -142,6 +147,7 @@ public class JvmManager {
 				key = "Mac-x64";
 			}
 		}
+
 		if (CadoodleUpdater.isWin()) {
 			if (CadoodleUpdater.isArm()) {
 				key = "UNKNOWN";
@@ -247,59 +253,83 @@ public class JvmManager {
 		return String.format("%6s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
 	}
 
-	private static File download(String version, String downloadJsonURL, long sizeOfJson, ProgressBar progress,
-			String bindir, String filename) throws MalformedURLException, IOException, FileNotFoundException {
-		File folder = new File(bindir + version + "/");
-		File exe = new File(bindir + version + "/" + filename + "_TMP");
-		File exeFinal = new File(bindir + version + "/" + filename);
-		if (downloadJsonURL != null) {
-			try {
-				URL url = new URL(downloadJsonURL);
-				URLConnection connection = url.openConnection();
-				InputStream is = connection.getInputStream();
-				ProcessInputStream pis = new ProcessInputStream(is, (int) sizeOfJson);
-				pis.addListener(new Listener() {
-					@Override
-					public void process(double percent) {
-						if (System.currentTimeMillis() - timeSincePrint > 1000) {
-							timeSincePrint = System.currentTimeMillis();
-							System.out.println("Download " + filename + " percent " + percent);
+	public static long getRemoteSize(String url) throws IOException {
+		HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+		c.setRequestMethod("HEAD");		  // <-- important
+		c.setConnectTimeout(5_000);
+		c.setReadTimeout (5_000);
+		c.connect();
 
-						}
-						Platform.runLater(() -> {
-							if (percent < 100)
-								progress.setProgress(percent);
-						});
-					}
-				});
+		String len = c.getHeaderField("Content-Length");
+		c.disconnect();
 
-				if (!folder.exists() || !exeFinal.exists()) {
-					if (exe.exists())
-						exe.delete();
-					System.out.println("Start Downloading " + filename);
-					Platform.runLater(() -> infoBar.setText("Downloading Java Runtime..."));
-					folder.mkdirs();
-					exe.createNewFile();
-					byte dataBuffer[] = new byte[1024];
-					int bytesRead;
-					FileOutputStream fileOutputStream = new FileOutputStream(exe.getAbsoluteFile());
-					while ((bytesRead = pis.read(dataBuffer, 0, 1024)) != -1) {
-						fileOutputStream.write(dataBuffer, 0, bytesRead);
-					}
-					fileOutputStream.close();
-					pis.close();
-					System.out.println("Finished downloading " + filename);
-				} else {
-					System.out.println("Not downloadeing, it existst " + filename);
-				}
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}
-		}
-		System.out.println("Using JVM " + exeFinal.getAbsolutePath());
-		if (exe.exists())
-			Files.move(exe.toPath(), exeFinal.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		return exeFinal;
+		return len == null || len.isEmpty() ? -1L : Long.parseLong(len);
 	}
 
+	private static File download(String version, String downloadURL, ProgressBar progressBar, Label progressLabel, String bindir, String filename)
+		throws MalformedURLException, IOException, FileNotFoundException {
+		File exeFinal = null;
+		long sizeOfJson = getRemoteSize(downloadURL);
+		if (sizeOfJson == 0)
+			System.out.printf("Failed to get filesize of: %s %n", downloadURL);
+		else
+		{
+			System.out.printf("Downloading %s %n", downloadURL);
+			File folder = new File(bindir + version + "/");
+			File exe = new File(bindir + version + "/" + filename + "_TMP");
+			exeFinal = new File(bindir + version + "/" + filename);
+
+			if (downloadURL != null) {
+				try {
+					URL url = new URL(downloadURL);
+					URLConnection connection = url.openConnection();
+					InputStream is = connection.getInputStream();
+					ProcessInputStream pis = new ProcessInputStream(is, (int) sizeOfJson);
+					pis.addListener(new Listener() {
+						@Override
+						public void process(double percent) {
+							if ((System.currentTimeMillis() - timeSincePrint) > 1000) {
+								timeSincePrint = System.currentTimeMillis();
+								System.out.println(String.format("Downloading %s %.1f%%", filename, (percent * 100)));
+								Platform.runLater(() -> {
+									if (percent <= 1.0) {
+										progressBar.setProgress(percent);
+										progressLabel.setText(String.format("Downloading %.1f%%", (percent * 100)));
+									}
+								});
+							}
+						}
+					});
+
+					if (!folder.exists() || !exeFinal.exists()) {
+						if (exe.exists())
+							exe.delete();
+						System.out.println("Start Downloading " + filename);
+						Platform.runLater(()->infoBar.setText("Downloading " + filename));
+						folder.mkdirs();
+						exe.createNewFile();
+						int dataBufferSize = 16 * 1024;
+						byte dataBuffer[] = new byte[dataBufferSize];
+						int bytesRead;
+						FileOutputStream fileOutputStream = new FileOutputStream(exe.getAbsoluteFile());
+						while ((bytesRead = pis.read(dataBuffer, 0, dataBufferSize)) != -1) {
+							fileOutputStream.write(dataBuffer, 0, bytesRead);
+						}
+
+						fileOutputStream.close();
+						pis.close();
+						System.out.println("Finished downloading " + filename);
+					} else {
+						System.out.println("Not downloading, it exists " + filename);
+					}
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+			System.out.println("Using JVM " + exeFinal.getAbsolutePath());
+			if (exe.exists())
+				Files.move(exe.toPath(), exeFinal.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		}
+		return exeFinal;
+	}
 }

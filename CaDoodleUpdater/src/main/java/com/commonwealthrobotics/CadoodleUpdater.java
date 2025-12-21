@@ -36,7 +36,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.swing.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -58,8 +58,10 @@ public class CadoodleUpdater {
 	@FXML // URL location of the FXML file that was given to the FXMLLoader
 	private URL location;
 
-	@FXML // fx:id="progress"
-	private ProgressBar progress; // Value injected by FXMLLoader
+	@FXML // fx:id="progressBar"
+	private ProgressBar progressBar; // Value injected by FXMLLoader
+	@FXML // fx:id="progressLabel"
+	private Label progressLabel; // Value injected by FXMLLoader
 
 	@FXML // fx:id="previousVersion"
 	private Label previousVersion; // Value injected by FXMLLoader
@@ -88,94 +90,125 @@ public class CadoodleUpdater {
 	private static String downloadJarURL;
 	private static String downloadJsonURL;
 	private static String downloadZip;
-	
+	private static long timeSincePrint = System.currentTimeMillis();
+
 	public static String repoName;
 	public static String jarName;
 
 	@FXML
 	void onNo(ActionEvent event) {
-		System.out.println("No path");
+		yesButton.setDisable(true); // Prevent another button click
+		noButton.setDisable(true);
+		System.out.println("No path, user just wants to launch the app");
+		infoBar.setText("Starting application...");
 		launchApplication();
 	}
 
 	@FXML
 	void onYes(ActionEvent event) {
-		System.out.println("Yes path");
-		yesButton.setDisable(true);
+		System.out.println("Yes path, user wants/needs to update the app");
+		yesButton.setDisable(true); // Prevent another button click
 		noButton.setDisable(true);
-		infoBar.setText("Downloading CaDoodle JAR...");
+		progressBar.setDisable(false);
+		infoBar.setText("Downloading CaDoodle Application, please wait...");
+		progressLabel.setText("Downloading 0.0%");
+
 		new Thread(() -> {
 
+			boolean downloadFailed = false;
 			try {
-				
 				String downloadURL2 = downloadJarURL;
-				System.out.println("Downloading "+downloadJarURL);
+				System.out.println("Downloading " + downloadJarURL);
 				URL url = new URL(downloadURL2);
 				URLConnection connection = url.openConnection();
 				InputStream is = connection.getInputStream();
+
 				ProcessInputStream pis = new ProcessInputStream(is, (int) sizeOfJar);
 				pis.addListener(new Listener() {
 					@Override
 					public void process(double percent) {
-						Platform.runLater(() -> {
-							progress.setProgress(percent);
-						});
+						if ((System.currentTimeMillis() - timeSincePrint) > 1000) {
+							timeSincePrint = System.currentTimeMillis();
+							System.out.println(String.format("Downloading %s %.1f%%", downloadURL2, (percent * 100)));
+							Platform.runLater(() -> {
+								if (percent <= 1.0) {
+									progressBar.setProgress(percent);
+									progressLabel.setText(String.format("Downloading %.1f%%", (percent * 100)));
+								}
+							});
+						}
 					}
 				});
+
 				File folder = new File(bindir + latestVersionString + "/");
-				File exe = new File(bindir + latestVersionString + "/" + jarName+"_TMP");
+				File exe = new File(bindir + latestVersionString + "/" + jarName + "_TMP");
 				File exeFinal = new File(bindir + latestVersionString + "/" + jarName);
 
 				if (!folder.exists() || !exeFinal.exists() || sizeOfJar != exeFinal.length()) {
 					folder.mkdirs();
-					if(exe.exists())
+
+					if (exe.exists())
 						exe.delete();
+
 					exe.createNewFile();
-					byte dataBuffer[] = new byte[1024];
+					int bufferSize = 16 * 1024;
+					byte dataBuffer[] = new byte[bufferSize];
 					int bytesRead;
 					FileOutputStream fileOutputStream = new FileOutputStream(exe.getAbsoluteFile());
-					while ((bytesRead = pis.read(dataBuffer, 0, 1024)) != -1) {
+					while ((bytesRead = pis.read(dataBuffer, 0, bufferSize)) != -1) {
 						fileOutputStream.write(dataBuffer, 0, bytesRead);
 					}
 					fileOutputStream.close();
 					pis.close();
-
 				}
 
-				if(exe.exists())
+				if (exe.exists())
 					Files.move(exe.toPath(), exeFinal.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
 				if (folder.exists() && exeFinal.exists() && sizeOfJar == exeFinal.length())
 					myVersionString = latestVersionString;
 
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
+				System.out.println("Download failed!");
+				infoBar.setText("Download failed!");
+				downloadFailed = true;
 				e1.printStackTrace();
 			}
-			launchApplication();
+
+			if (!downloadFailed)
+				launchApplication();
 		}).start();
 	}
-	private boolean launched=false;
+
+	private boolean launched = false;
+
 	public void launchApplication() {
-		if(launched)
-			throw new RuntimeException("Applicaion is already launched!");
-		launched=true;
+		if (launched) {
+			infoBar.setText("Application is already running!");
+			throw new RuntimeException("Application is already running!");
+		}
+
+		launched = true;
 		Platform.runLater(() -> {
+			infoBar.setText("Starting application...");
 			yesButton.setDisable(true);
 			noButton.setDisable(true);
-			
 		});
+
 		new Thread(() -> {
 			String command;
 			try {
-				command = JvmManager.getCommandString(project, repoName, myVersionString,downloadJsonURL, downloadZip,sizeOfZip,sizeOfJson,progress,bindir,infoBar);
+				command = JvmManager.getCommandString(project, repoName, myVersionString, downloadJsonURL, downloadZip, sizeOfZip, sizeOfJson, progressBar, progressLabel, bindir, infoBar);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.exit(1);
 				return;
 			}
+
 			// Run this later to show downloading the JVM
-			Platform.runLater(() ->stage.close());
+			Platform.runLater(() -> stage.close());
 
 			try {
 				Thread.sleep(100);
@@ -193,6 +226,7 @@ public class CadoodleUpdater {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
 			BufferedWriter writer;
 			try {
 				writer = new BufferedWriter(new FileWriter(myVersionFileString));
@@ -202,16 +236,18 @@ public class CadoodleUpdater {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	
-			String fc =!isWin()?
-						command + " " + bindir + myVersionString + "/" + jarName+"":
-							command + " \"" + bindir + myVersionString + "/" + jarName+"\"";
-			for(String s:argsFromSystem) {
-				fc+=(" "+s);
-			}
-			
-			String finalCommand=fc;
-			System.out.println("Running:\n\n"+finalCommand+"\n\n");
+
+			// Use quoted (Windows) or unquoted path (non-Windows)
+			String fc = (isWin() ? (command + " \"" + bindir + myVersionString + "/" + jarName + "\"") :
+								   (command + " "   + bindir + myVersionString + "/" + jarName + ""));
+
+			for (String s:argsFromSystem)
+				fc += (" " + s);
+
+			String finalCommand = fc;
+			System.out.println("Running:\n\n" + finalCommand + "\n\n");
+			System.out.println("JAVA_HOME: " + extractJavaHomeFromCommand(command) + "\n\n");
+
 			new Thread(() -> {
 				try {
 					// Get the current environment
@@ -220,14 +256,13 @@ public class CadoodleUpdater {
 					// Extract JAVA_HOME from the JVM path
 					// Assuming your command starts with the full path to java executable
 					String javaHome = extractJavaHomeFromCommand(command);
-					if (javaHome != null) {
-					    env.put("JAVA_HOME", javaHome);
-					}
+					if (javaHome != null)
+						env.put("JAVA_HOME", javaHome);
 
 					// Convert environment map to array format
 					String[] envArray = env.entrySet().stream()
-					    .map(entry -> entry.getKey() + "=" + entry.getValue())
-					    .toArray(String[]::new);
+						.map(entry -> entry.getKey() + "=" + entry.getValue())
+						.toArray(String[]::new);
 					// Execute with modified environment
 					Process process = Runtime.getRuntime().exec(finalCommand, envArray);
 					Thread thread = new Thread(()->{
@@ -251,12 +286,12 @@ public class CadoodleUpdater {
 						}
 					});
 					thread.start();
+
 					Thread thread2 = new Thread(()->{
 						BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 						String line;
 						try {
-							while ((line = reader.readLine()) != null&& 
-									process.isAlive()) {
+							while (((line = reader.readLine()) != null) && process.isAlive()) {
 								System.out.println(line);
 								try {
 									Thread.sleep(10);
@@ -272,6 +307,7 @@ public class CadoodleUpdater {
 						}
 					});
 					thread2.start();
+
 					try {
 						thread2.join();
 						thread.join();
@@ -288,30 +324,31 @@ public class CadoodleUpdater {
 			}).start();
 		}).start();
 	}
+
 	private static String extractJavaHomeFromCommand(String command) {
-	    try {
-	        // Split the command to get the java executable path
-	        String[] parts = command.split(" ");
-	        if (parts.length > 0) {
-	            String javaPath = parts[0];
-	            
-	            // Remove quotes if present
-	            javaPath = javaPath.replace("\"", "");
-	            
-	            // Get the parent directory of the bin folder
-	            Path path = Paths.get(javaPath);
-	            if (path.getFileName().toString().startsWith("java")) {
-	                // Go up from java executable to bin, then to JAVA_HOME
-	                Path binDir = path.getParent();
-	                if (binDir != null && binDir.getFileName().toString().equals("bin")) {
-	                    return binDir.getParent().toString();
-	                }
-	            }
-	        }
-	    } catch (Exception e) {
-	        System.err.println("Could not extract JAVA_HOME from command: " + e.getMessage());
-	    }
-	    return null;
+		try {
+			// Split the command to get the java executable path
+			String[] parts = command.split(" ");
+			if (parts.length > 0) {
+				String javaPath = parts[0];
+				
+				// Remove quotes if present
+				javaPath = javaPath.replace("\"", "");
+				
+				// Get the parent directory of the bin folder
+				Path path = Paths.get(javaPath);
+				if (path.getFileName().toString().startsWith("java")) {
+					// Go up from java executable to bin, then to JAVA_HOME
+					Path binDir = path.getParent();
+					if (binDir != null && binDir.getFileName().toString().equals("bin")) {
+						return binDir.getParent().toString();
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.err.println("Could not extract JAVA_HOME from command: " + e.getMessage());
+		}
+		return null;
 	}
 	public static boolean isWin() {
 		return System.getProperty("os.name").toLowerCase().contains("windows");
@@ -342,39 +379,40 @@ public class CadoodleUpdater {
 			String jsonText = readAll(rd);
 			// Create the type, this tells GSON what datatypes to instantiate when parsing
 			// and saving the json
-			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {
-			}.getType();
-			// chreat the gson object, this is the parsing factory
+			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {}.getType();
+			// create the gson object, this is the parsing factory
 			Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 			database = gson.fromJson(jsonText, TT_mapStringString);
 			latestVersionString = (String) database.get("tag_name");
 			@SuppressWarnings("unchecked")
 			List<Map<String, Object>> assets = (List<Map<String, Object>>) database.get("assets");
-			downloadJarURL=null;
+			downloadJarURL = null;
 			for (Map<String, Object> key : assets) {
 				String string = (String) key.get("name");
 
-				System.out.println("Checking "+string);
-				if (string.contentEquals(jarName)) {
+				System.out.println("Checking " + string);
+				if (string.equals(jarName)) {
 					downloadJarURL = (String) key.get("browser_download_url");
 					sizeOfJar = ((Double) key.get("size")).longValue();
 					System.out.println(downloadJarURL + " Size " + sizeOfJar + " bytes");
-				}else
+				} else
 					System.out.println(string+" is not "+jarName);
-				if (string.contentEquals("jvm.json")) {
+				if (string.equals("jvm.json")) {
 					downloadJsonURL = (String) key.get("browser_download_url");
 					sizeOfJson = ((Double) key.get("size")).longValue();
 					System.out.println(downloadJsonURL + " Size " + sizeOfJson + " bytes");
-				}if (string.contentEquals("gitcache.zip")) {
+				}
+				
+				if (string.equals("gitcache.zip")) {
 					downloadZip = (String) key.get("browser_download_url");
 					sizeOfZip = ((Double) key.get("size")).longValue();
 					System.out.println(downloadZip + " Size " + sizeOfZip + " bytes");
-				}else
-					System.out.println(string+" is not jvm.json");
+				} else
+					System.out.println(string + " is not gitcache.zip");
 				
 			}
-			if(downloadJarURL==null) {
-				System.err.println("FAIL the Jar is missing in release "+latestVersionString);
+			if (downloadJarURL==null) {
+				System.err.println("FAIL the Jar is missing in release " + latestVersionString);
 				System.exit(1);
 			}
 		} finally {
@@ -384,27 +422,34 @@ public class CadoodleUpdater {
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void initialize() {
-		assert progress != null : "fx:id=\"progress\" was not injected: check your FXML file 'ui.fxml'.";
+		assert progressBar != null : "fx:id=\"progressBar\" was not injected: check your FXML file 'ui.fxml'.";
 		assert previousVersion != null : "fx:id=\"previousVersion\" was not injected: check your FXML file 'ui.fxml'.";
 		assert currentVersion != null : "fx:id=\"currentVersion\" was not injected: check your FXML file 'ui.fxml'.";
-		boolean noInternet = false;
+
+		stage.setTitle("Auto-Updater for " + repoName);
+		yesButton.setDisable(true);
+		noButton.setDisable(true);
 		bindir = System.getProperty("user.home") + "/bin/" + repoName + "Install/";
 		myVersionFileString = bindir + "currentversion.txt";
 		String pinFileName = bindir + "pinVersion";
 		File pinFile = new File(pinFileName);
-		if(pinFile.exists()) {
+		boolean noInternet = false;
+
+		if (pinFile.exists()) {
 			noInternet=true;
 		}
-		if(!noInternet)
+
+		if (!noInternet) {
 			try {
 				readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases/latest");
-				binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " Mb");
+				binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " MB");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				noInternet=true;
 			}
-		stage.setTitle("Auto-Updater for " + repoName);
+		}
+
 		currentVersion.setText(latestVersionString);
 		myVersionFile = new File(myVersionFileString);
 		bindirFile = new File(bindir);
@@ -426,18 +471,24 @@ public class CadoodleUpdater {
 				e.printStackTrace();
 			}
 		}
-		if(!noInternet) {
-			if(myVersionString==null) {
+
+		if (!noInternet) {
+			if (myVersionString == null) {
 				launchApplication();
 				return;
 			}
-			else
-				if (myVersionString.contentEquals(latestVersionString)) {
+			else {
+				if (myVersionString.equals(latestVersionString)) {
 					launchApplication();
 					return;
 				}
-		}
-		if(noInternet) {
+				// Internet access available and an update is available
+				// Allow user to download the update or just start the application
+				infoBar.setText("An update is available.\nWould you like to download it now?");
+				yesButton.setDisable(false);
+				noButton.setDisable(false);
+			}
+		} else {
 			onNo(null);
 			return;
 		}

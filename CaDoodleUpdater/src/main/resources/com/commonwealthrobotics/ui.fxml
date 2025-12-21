@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="658.0" prefWidth="611.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.commonwealthrobotics.CadoodleUpdater">
    <children>
@@ -20,14 +21,19 @@
         </columnConstraints>
         <rowConstraints>
           <RowConstraints maxHeight="426.0" minHeight="10.0" prefHeight="426.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="331.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="331.0" minHeight="10.0" prefHeight="88.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="165.0" minHeight="10.0" prefHeight="82.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="331.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="84.0" minHeight="10.0" prefHeight="84.0" vgrow="NEVER" />
+          <RowConstraints maxHeight="42.0" minHeight="10.0" prefHeight="42.0" vgrow="NEVER" />
         </rowConstraints>
          <children>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
+            <AnchorPane prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="3">
                <children>
-                  <ProgressBar fx:id="progress" progress="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ProgressBar fx:id="progressBar" progress="0.0" disable="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0" />
+                  <Label fx:id="progressLabel" alignment="CENTER"  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
                </children>
             </AnchorPane>
             <GridPane GridPane.rowIndex="2">
@@ -39,64 +45,65 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-padding: 0 2 2 2;">
                      <children>
-                        <Button fx:id="yesButton" mnemonicParsing="false" onAction="#onYes" text="Update Please!" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Button fx:id="yesButton" mnemonicParsing="false" onAction="#onYes" text="Download" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <styleClass>
                               <String fx:value="image-button-focus" />
                               <String fx:value="image-button" />
-                           </styleClass></Button>
+                           </styleClass>
+                           <font>
+                              <Font size="20.0" />
+                           </font></Button>
                      </children>
                   </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1"  style="-fx-padding: 0 2 2 2;">
                      <children>
-                        <Button fx:id="noButton" mnemonicParsing="false" onAction="#onNo" text="Keep It The Way It Was" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Button fx:id="noButton" mnemonicParsing="false" onAction="#onNo" text="Skip for now" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <styleClass>
                               <String fx:value="image-button" />
                               <String fx:value="image-button-focus" />
-                           </styleClass></Button>
+                           </styleClass>
+                           <font>
+                              <Font size="20.0" />
+                           </font></Button>
                      </children>
                   </AnchorPane>
                </children>
             </GridPane>
             <GridPane>
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
                   <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="117.0" minHeight="10.0" prefHeight="117.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="117.0" minHeight="10.0" prefHeight="117.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="39.0" minHeight="10.0" prefHeight="37.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="A new version is availible!" GridPane.rowIndex="1">
-                     <GridPane.margin>
-                        <Insets left="20.0" />
-                     </GridPane.margin>
-                  </Label>
-                  <Label alignment="CENTER_RIGHT" text="My Current Version" GridPane.rowIndex="2">
+                  <Label text="Installed version" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets left="20.0" right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label alignment="CENTER_RIGHT" text="Latest Version" GridPane.rowIndex="3">
+                  <Label text="Latest version" GridPane.rowIndex="3">
                      <GridPane.margin>
                         <Insets left="20.0" right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label fx:id="previousVersion" text="None" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <Label fx:id="previousVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label fx:id="currentVersion" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                  <Label fx:id="currentVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <GridPane.margin>
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label fx:id="binary" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <Label fx:id="binary" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <opaqueInsets>
                         <Insets left="20.0" />
                      </opaqueInsets>
@@ -111,10 +118,13 @@
                   </ImageView>
                </children>
             </GridPane>
-            <Label fx:id="infoBar" text="Would you like to download the latest version?" GridPane.rowIndex="1">
+            <Label fx:id="infoBar" text="-" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets left="20.0" />
                </GridPane.margin>
+               <font>
+                  <Font size="18.0" />
+               </font>
             </Label>
          </children>
       </GridPane>
