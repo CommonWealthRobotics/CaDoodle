@@ -195,7 +195,8 @@ public class CadoodleUpdater {
 			yesButton.setDisable(true);
 			noButton.setDisable(true);
 		});
-
+		// Run this later to show downloading the JVM
+		Platform.runLater(() -> stage.close());
 		new Thread(() -> {
 			String command;
 			try {
@@ -207,8 +208,7 @@ public class CadoodleUpdater {
 				return;
 			}
 
-			// Run this later to show downloading the JVM
-			Platform.runLater(() -> stage.close());
+			
 
 			try {
 				Thread.sleep(100);
@@ -443,9 +443,9 @@ public class CadoodleUpdater {
 			try {
 				readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases/latest");
 				binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " MB");
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 				noInternet=true;
 			}
 		}

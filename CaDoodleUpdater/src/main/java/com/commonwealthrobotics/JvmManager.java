@@ -90,7 +90,7 @@ public class JvmManager {
 			String name = vm.get("name").toString();
 			List<String> jvmargs = null;
 			Object o = vm.get("jvmargs");
-			System.out.println("jvmargs: " + jvmargs);
+			System.out.println("jvmargs: " + o);
 			if (o instanceof List) {
 				@SuppressWarnings("unchecked")
 				List<String> tmp = (List<String>) o;
@@ -271,11 +271,18 @@ public class JvmManager {
 	private static File download(String version, String downloadURL, ProgressBar progressBar, Label progressLabel,
 			String bindir, String filename) throws MalformedURLException, IOException, FileNotFoundException {
 		File exeFinal = null;
+		
+		
 
-		System.out.printf("Downloading %s %n", downloadURL);
 		File folder = new File(bindir + version + "/");
 		File exe = new File(bindir + version + "/" + filename + "_TMP");
 		exeFinal = new File(bindir + version + "/" + filename);
+		if(exeFinal.exists()) {
+			System.out.println("Skip Downloading "+ exeFinal+" exists already");
+			return exeFinal;
+		}
+		
+		System.out.printf("Downloading %s %n", downloadURL);
 
 		if (downloadURL != null) {
 			long sizeOfJson = getRemoteSize(downloadURL);
