@@ -121,13 +121,17 @@ public class JvmManager {
 			}
 			String cmd = bindir + name + "/bin/java" + (CadoodleUpdater.isWin() ? ".exe" : "") + " ";
 			// Mac OS set the dock icon
-//		    String iconPath = extractIconToTemp();
-//		    if (iconPath != null) {
-//		    	if(CadoodleUpdater.isMac()) {
-//		    		cmd += "-Xdock:icon=" + iconPath + " ";
-//		    		cmd += "-Xdock:name=CADoodle ";
-//		    	}
-//		    }
+			String iconPath = extractIconToTemp();
+			if (iconPath != null) {
+				if (CadoodleUpdater.isMac()) {
+					cmd += "-Xdock:icon=" + iconPath + " ";
+					cmd += "-Xdock:name=CADoodle ";
+				}
+				if (CadoodleUpdater.isLin()) {
+					cmd += "-Dcadoodle.icon.path=" + iconPath + " ";
+					cmd += "-Dglass.gtk.wmclass=CaDoodle ";
+				}
+			}
 			for (String s : jvmargs) {
 				cmd += s + " ";
 			}
@@ -140,25 +144,26 @@ public class JvmManager {
 		}
 		return null;
 	}
+
 	private static String extractIconToTemp() {
-	    try {
-	        // Create temp file for icon
-	        Path tempIcon = Files.createTempFile("cadoodle-icon", ".png");
-	        tempIcon.toFile().deleteOnExit();
-	        
-	        // Extract icon from resources (adjust path as needed)
-	        try (InputStream in =Main.class.getResourceAsStream("CADoodle-Icon.png")) {
-	            if (in != null) {
-	                Files.copy(in, tempIcon, StandardCopyOption.REPLACE_EXISTING);
-	                return tempIcon.toAbsolutePath().toString();
-	            }
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return null;
+		try {
+			// Create temp file for icon
+			Path tempIcon = Files.createTempFile("cadoodle-icon", ".png");
+			tempIcon.toFile().deleteOnExit();
+
+			// Extract icon from resources (adjust path as needed)
+			try (InputStream in = Main.class.getResourceAsStream("CADoodle-Icon.png")) {
+				if (in != null) {
+					Files.copy(in, tempIcon, StandardCopyOption.REPLACE_EXISTING);
+					return tempIcon.toAbsolutePath().toString();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
-	
+
 	private static String discoverKey(String key) {
 		if (CadoodleUpdater.isLin()) {
 			if (CadoodleUpdater.isArm()) {
@@ -297,17 +302,15 @@ public class JvmManager {
 	private static File download(String version, String downloadURL, ProgressBar progressBar, Label progressLabel,
 			String bindir, String filename) throws MalformedURLException, IOException, FileNotFoundException {
 		File exeFinal = null;
-		
-		
 
 		File folder = new File(bindir + version + "/");
 		File exe = new File(bindir + version + "/" + filename + "_TMP");
 		exeFinal = new File(bindir + version + "/" + filename);
-		if(exeFinal.exists()) {
-			System.out.println("Skip Downloading "+ exeFinal+" exists already");
+		if (exeFinal.exists()) {
+			System.out.println("Skip Downloading " + exeFinal + " exists already");
 			return exeFinal;
 		}
-		
+
 		System.out.printf("Downloading %s %n", downloadURL);
 
 		if (downloadURL != null) {
