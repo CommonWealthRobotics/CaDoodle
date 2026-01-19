@@ -120,6 +120,14 @@ public class JvmManager {
 				System.out.println("Not extracting, VM exists " + dest.getAbsolutePath());
 			}
 			String cmd = bindir + name + "/bin/java" + (CadoodleUpdater.isWin() ? ".exe" : "") + " ";
+			// Mac OS set the dock icon
+//		    String iconPath = extractIconToTemp();
+//		    if (iconPath != null) {
+//		    	if(CadoodleUpdater.isMac()) {
+//		    		cmd += "-Xdock:icon=" + iconPath + " ";
+//		    		cmd += "-Xdock:name=CADoodle ";
+//		    	}
+//		    }
 			for (String s : jvmargs) {
 				cmd += s + " ";
 			}
@@ -132,7 +140,25 @@ public class JvmManager {
 		}
 		return null;
 	}
-
+	private static String extractIconToTemp() {
+	    try {
+	        // Create temp file for icon
+	        Path tempIcon = Files.createTempFile("cadoodle-icon", ".png");
+	        tempIcon.toFile().deleteOnExit();
+	        
+	        // Extract icon from resources (adjust path as needed)
+	        try (InputStream in =Main.class.getResourceAsStream("CADoodle-Icon.png")) {
+	            if (in != null) {
+	                Files.copy(in, tempIcon, StandardCopyOption.REPLACE_EXISTING);
+	                return tempIcon.toAbsolutePath().toString();
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+	
 	private static String discoverKey(String key) {
 		if (CadoodleUpdater.isLin()) {
 			if (CadoodleUpdater.isArm()) {
