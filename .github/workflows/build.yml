@@ -20,7 +20,10 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update
-        apt-get install -y fakeroot binutils
+        apt-get install -y fakeroot binutils  wget
+        echo '#!/bin/sh' > /usr/local/bin/sudo
+        echo 'exec "$@"' >> /usr/local/bin/sudo
+        chmod +x /usr/local/bin/sudo
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
