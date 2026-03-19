@@ -20,7 +20,12 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update
-        apt-get install -y openjdk-21-jdk fakeroot binutils
+        apt-get install -y fakeroot binutils
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+          distribution: temurin
+          java-version: 21
     - name: Build
       run: bash package-linux_arm64.sh
     - name: Upload math result for job Linux
