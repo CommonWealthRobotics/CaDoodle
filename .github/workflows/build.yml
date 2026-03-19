@@ -10,6 +10,24 @@ on:
       - '*'
 
 jobs:
+  debian-bookworm:
+    runs-on: ubuntu-24.04-arm
+    container:
+        image: debian:bookworm
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Install dependencies
+      run: |
+        apt-get update
+        apt-get install -y openjdk-21-jdk fakeroot binutils
+    - name: Build
+      run: bash package-linux_arm64.sh
+    - name: Upload math result for job Linux
+      uses: actions/upload-artifact@v4
+      with:
+          name: linux-arm-bookworm-lib
+          path: release/*
   linux-arm:
     runs-on: ubuntu-24.04-arm
     steps:
