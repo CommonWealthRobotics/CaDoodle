@@ -88,7 +88,7 @@ else
 	chmod +x $TOOL
 fi
 
-./$TOOL $NAME.AppDir
+./$TOOL --appimage-extract-and-run $NAME.AppDir
 echo "Testing executable:"
 #./$NAME-$ARCH.AppImage one two
 echo "Building .deb..."
