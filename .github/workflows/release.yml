@@ -144,7 +144,7 @@ jobs:
         with:
           name: linux-arm-bookworm-lib 
           path: .
-       - name: Check output
+      - name: Rename files for Bookworm
         env:
           VERSION_SEMVER: ${{ steps.vars.outputs.tag }}
         run: |
