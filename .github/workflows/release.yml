@@ -6,7 +6,32 @@ on:
          - '*'
 
 jobs:
-
+  debian-bookworm:
+    runs-on: ubuntu-24.04-arm
+    container:
+        image: debian:bookworm
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Install dependencies
+      run: |
+        apt-get update
+        apt-get install -y fakeroot binutils  wget  file
+        echo '#!/bin/sh' > /usr/local/bin/sudo
+        echo 'exec "$@"' >> /usr/local/bin/sudo
+        chmod +x /usr/local/bin/sudo
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+          distribution: temurin
+          java-version: 21
+    - name: Build
+      run: bash package-linux_arm64.sh
+    - name: Upload math result for job Linux
+      uses: actions/upload-artifact@v4
+      with:
+          name: linux-arm-bookworm-lib
+          path: release/*
   linux-arm:
     runs-on: ubuntu-24.04-arm
     steps:
@@ -99,7 +124,7 @@ jobs:
           path: release/*
   publish:
     runs-on: ubuntu-latest 
-    needs: [macos,windows,linux,macos-arm,  linux-arm]
+    needs: [macos,windows,linux,macos-arm,  linux-arm,debian-bookworm]
     permissions: 
       contents: write
       packages: write 
@@ -114,6 +139,17 @@ jobs:
         run: |
           echo $VERSION_SEMVER
           echo ${{ steps.vars.outputs.tag }}
+      - name: Download  result for job Windows
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-arm-bookworm-lib 
+          path: .
+       - name: Check output
+        env:
+          VERSION_SEMVER: ${{ steps.vars.outputs.tag }}
+        run: |
+          mv CaDoodle-Linux-arm64.AppImage CaDoodle-Linux-arm64-bookworm.AppImage
+          mv CaDoodle-Linux-arm64.deb CaDoodle-Linux-arm64-bookworm.deb  
       - name: Download  result for job Windows
         uses: actions/download-artifact@v4
         with:
@@ -157,6 +193,8 @@ jobs:
             CaDoodle-Windows-x86_64.zip
             CaDoodle-MacOS-x86_64.dmg
             CaDoodle-MacOS-arm64.dmg
+            CaDoodle-Linux-arm64-bookworm.AppImage
+            CaDoodle-Linux-arm64-bookworm.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
