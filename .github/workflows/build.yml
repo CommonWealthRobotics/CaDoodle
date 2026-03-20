@@ -20,7 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update
-        apt-get install -y fakeroot binutils  wget
+        apt-get install -y fakeroot binutils  wget  file
         echo '#!/bin/sh' > /usr/local/bin/sudo
         echo 'exec "$@"' >> /usr/local/bin/sudo
         chmod +x /usr/local/bin/sudo
