@@ -63,7 +63,7 @@ rm -rf $NAME
   --temp "temp1"  \
   --app-version "$VERSION" \
   --icon "$ICON" \
-  --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
+  --java-options '--enable-preview -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
   
 echo "Zipping standalone version"
 rm -rf *.zip
@@ -82,7 +82,7 @@ echo "Building Local installer"
   --win-menu \
   --win-dir-chooser \
   --win-per-user-install \
-  --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
+  --java-options '--enable-preview -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
 
 echo "Building system wide installer" 
   
@@ -97,7 +97,7 @@ echo "Building system wide installer"
   --win-shortcut \
   --win-menu \
   --win-dir-chooser \
-  --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
+  --java-options '--enable-preview -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
 
 ls -al
 rm -rf release
