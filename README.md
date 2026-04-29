@@ -30,7 +30,7 @@ For silent local installs
 
 ```
 
-CaDoodle-Windows-x86_64.exe /S 
+CaDoodle-Windows-x86_64.exe /Q 
 
 ```
 
@@ -38,9 +38,9 @@ For silent system installs
 
 ```
 
-CaDoodle-Windows-System-x86_64.exe /S 
+CaDoodle-Windows-System-x86_64.exe /Q 
 
-CaDoodle-Windows-System-x86_64.exe /S /D=D:\CustomLocation\CaDoodle\
+CaDoodle-Windows-System-x86_64.exe /Q /D=D:\CustomLocation\CaDoodle\
 
 ```
 
