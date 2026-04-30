@@ -171,7 +171,7 @@ public class CadoodleUpdater {
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				System.out.println("Download failed!");
-				infoBar.setText("Download failed!");
+				infoBar.setText("Download failed! "+e1.getMessage());
 				downloadFailed = true;
 				e1.printStackTrace();
 			}
