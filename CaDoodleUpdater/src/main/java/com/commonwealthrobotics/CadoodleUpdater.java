@@ -196,7 +196,7 @@ public class CadoodleUpdater {
 			noButton.setDisable(true);
 		});
 		// Run this later to show downloading the JVM
-		Platform.runLater(() -> stage.close());
+		
 		new Thread(() -> {
 			String command;
 			try {
@@ -286,7 +286,7 @@ public class CadoodleUpdater {
 						}
 					});
 					thread.start();
-
+					Platform.runLater(() -> stage.close());
 					Thread thread2 = new Thread(()->{
 						BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 						String line;
