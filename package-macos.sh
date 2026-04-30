@@ -11,13 +11,13 @@ fi
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ARCH=x86_64
-JVM=zulu17.50.19-ca-fx-jdk17.0.11-macosx_x64
+JVM=zulu25.32.21-ca-fx-jdk25.0.2-macosx_x64
 if [[ $(uname -m) == 'arm64' ]]; then
   ARCH=arm64
-  echo "M1 Mac detected https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-macosx_aarch64.tar.gz"
-  JVM=zulu17.50.19-ca-fx-jdk17.0.11-macosx_aarch64
+  echo "M1 Mac detected https://cdn.azul.com/zulu/bin/zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64.tar.gz"
+  JVM=zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64
 else
-  echo "x86 Mac detected https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-macosx_x64.tar.gz"
+  echo "x86 Mac detected https://cdn.azul.com/zulu/bin/zulu25.32.21-ca-fx-jdk25.0.2-macosx_x64.tar.gz"
 
 fi
 set -e

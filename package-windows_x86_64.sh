@@ -12,7 +12,7 @@ fi
 
 #https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-win_x64.zip
 #   zulu17.50.19-ca-fx-jdk17.0.11-win_x64
-JVM=zulu17.50.19-ca-fx-jdk17.0.11-win_x64
+JVM=zulu25.32.21-ca-fx-jdk25.0.2-win_x64
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 set -e

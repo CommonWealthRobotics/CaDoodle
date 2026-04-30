@@ -15,7 +15,7 @@ fi
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 export ARCH=arm64
-JVM=zulu17.56.15-ca-fx-jdk17.0.14-linux_aarch64
+JVM=zulu25.32.21-ca-fx-jdk25.0.2-linux_aarch64
 set -e
 ZIP=$JVM.tar.gz
 export JAVA_HOME=$HOME/bin/java17/
