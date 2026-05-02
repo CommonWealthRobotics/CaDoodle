@@ -63,7 +63,7 @@ rm -rf $NAME
   --temp "temp1"  \
   --app-version "$VERSION" \
   --icon "$ICON" \
-  --add-modules jdk.crypto.ec,jdk.crypto.cryptoki,jdk.crypto.mscapi \
+  --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,jdk.crypto.ec,jdk.crypto.cryptoki,jdk.crypto.mscapi  \
   --java-options '--enable-native-access=javafx.graphics -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
   
 echo "Zipping standalone version"
@@ -79,7 +79,7 @@ echo "Building Local installer"
   --temp "temp2" \
   --app-version "$VERSION" \
   --icon "$ICON" \
-    --add-modules jdk.crypto.ec,jdk.crypto.cryptoki,jdk.crypto.mscapi \
+  --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,jdk.crypto.ec,jdk.crypto.cryptoki,jdk.crypto.mscapi  \
   --win-shortcut \
   --win-menu \
   --win-dir-chooser \
@@ -96,7 +96,7 @@ echo "Building system wide installer"
   --temp "temp3" \
   --app-version "$VERSION" \
   --icon "$ICON" \
-    --add-modules jdk.crypto.ec,jdk.crypto.cryptoki,jdk.crypto.mscapi \
+  --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,jdk.crypto.ec,jdk.crypto.cryptoki,jdk.crypto.mscapi  \
   --win-shortcut \
   --win-menu \
   --win-dir-chooser \

@@ -80,3 +80,6 @@ distributions {
 		}
 	}
 }
+shadowJar {
+    mergeServiceFiles()
+}
