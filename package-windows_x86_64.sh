@@ -63,7 +63,7 @@ rm -rf $NAME
   --temp "temp1"  \
   --app-version "$VERSION" \
   --icon "$ICON" \
-  --java-options '--enable-preview -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
+  --java-options '--enable-native-access=javafx.graphics -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
   
 echo "Zipping standalone version"
 rm -rf *.zip
@@ -82,8 +82,8 @@ echo "Building Local installer"
   --win-menu \
   --win-dir-chooser \
   --win-per-user-install \
-  --java-options '--enable-preview -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
-
+  --java-options '--enable-native-access=javafx.graphics -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
+  
 echo "Building system wide installer" 
   
 "$PACKAGE" --input "$INPUT_DIR/" \
@@ -97,8 +97,8 @@ echo "Building system wide installer"
   --win-shortcut \
   --win-menu \
   --win-dir-chooser \
-  --java-options '--enable-preview -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
-
+  --java-options '--enable-native-access=javafx.graphics -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
+  
 ls -al
 rm -rf release
 mkdir release
