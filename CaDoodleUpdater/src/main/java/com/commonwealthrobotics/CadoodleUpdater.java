@@ -450,7 +450,7 @@ public class CadoodleUpdater {
 				binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " MB");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				//e.printStackTrace();
+				e.printStackTrace();
 				noInternet=true;
 			}
 		}
