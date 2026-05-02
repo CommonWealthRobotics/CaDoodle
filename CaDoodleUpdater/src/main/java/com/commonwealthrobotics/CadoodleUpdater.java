@@ -5,6 +5,8 @@ package com.commonwealthrobotics;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ResourceBundle;
@@ -372,21 +374,25 @@ public class CadoodleUpdater {
 		return sb.toString();
 	}
 
-	public static void readCurrentVersion(String url) throws IOException {
-		InputStream is = new URL(url).openStream();
+	public static void readCurrentVersion(String url) throws IOException, URISyntaxException {
+		System.out.println("Read current version from "+url);
+		InputStream is = new URI(url).toURL().openStream();
 		try {
 			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 			String jsonText = readAll(rd);
+			System.out.println("Got file contents "+jsonText);
 			// Create the type, this tells GSON what datatypes to instantiate when parsing
 			// and saving the json
 			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {}.getType();
 			// create the gson object, this is the parsing factory
 			Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 			database = gson.fromJson(jsonText, TT_mapStringString);
+			System.out.println("Database:\n"+database);
 			latestVersionString = (String) database.get("tag_name");
 			@SuppressWarnings("unchecked")
 			List<Map<String, Object>> assets = (List<Map<String, Object>>) database.get("assets");
 			downloadJarURL = null;
+			System.out.println("Assets:\n"+assets);
 			for (Map<String, Object> key : assets) {
 				String string = (String) key.get("name");
 
@@ -407,8 +413,7 @@ public class CadoodleUpdater {
 					downloadZip = (String) key.get("browser_download_url");
 					sizeOfZip = ((Double) key.get("size")).longValue();
 					System.out.println(downloadZip + " Size " + sizeOfZip + " bytes");
-				} else
-					System.out.println(string + " is not gitcache.zip");
+				} 
 				
 			}
 			if (downloadJarURL==null) {
