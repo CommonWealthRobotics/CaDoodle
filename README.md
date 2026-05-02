@@ -44,6 +44,14 @@ CaDoodle-Windows-System-x86_64.exe /Q /D=D:\CustomLocation\CaDoodle\
 
 ```
 
+### Windows debugging
+
+Open PowerShell (not cmd)
+
+```
+& "Documents\CaDoodle-Windows-x86_64\CaDoodle\CaDoodle.exe" 2>&1 | Tee-Object -filePath Documents\output.txt
+```
+
 # Visual Studio Code building the Java JAR file
 
 To build the updater Java JAR file in Visual Studio Code install the following extensions:
