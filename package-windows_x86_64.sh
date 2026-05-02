@@ -17,7 +17,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 set -e
 ZIP=$JVM.zip
-export JAVA_HOME="$HOME/bin/java17/"
+export JAVA_HOME="$HOME/bin/java25/"
 if test -d "$JAVA_HOME/$JVM/"; then
   echo "$JAVA_HOME exists."
 else
