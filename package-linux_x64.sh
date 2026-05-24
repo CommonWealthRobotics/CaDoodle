@@ -93,19 +93,6 @@ echo "Testing executable:"
 #./$NAME-$ARCH.AppImage one two
 echo "Building .deb..."
 rm -rf *.deb
-rm -rf deb-resources
-# Create jpackage resource dir with explicit minimal deps
-mkdir -p deb-resources
-cat << 'EOF' > deb-resources/control
-Package: PACKAGE_NAME
-Version: PACKAGE_VERSION
-Section: misc
-Priority: optional
-Architecture: PACKAGE_ARCH
-Maintainer: MAINTAINER_VAL
-Description: DESCRIPTION_VAL
-Depends: libc6 (>= 2.17), libgcc-s1, libstdc++6
-EOF
 
 $JAVA_HOME/bin/jpackage --input $BUILDDIR \
   --name $NAME \
@@ -120,7 +107,31 @@ $JAVA_HOME/bin/jpackage --input $BUILDDIR \
   --linux-menu-group "Education;Graphics;Development;" \
   --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false -Djava.security.egd=file:/dev/./urandom'
 
+
+echo "Patching .deb dependencies..."
+DEB_FILE=$(ls *.deb | head -1)
+EXTRACT_DIR="deb_extract"
+rm -rf $EXTRACT_DIR
+
+# Extract the deb
+dpkg-deb -R "$DEB_FILE" "$EXTRACT_DIR"
+
+# Show original deps for CI logs
+echo "Original Depends: $(grep '^Depends:' $EXTRACT_DIR/DEBIAN/control)"
+
+# Replace with explicit minimal deps (all that a bundled-JVM app truly needs)
+sed -i 's/^Depends:.*/Depends: libc6 (>= 2.17), libgcc-s1, libstdc++6/' "$EXTRACT_DIR/DEBIAN/control"
+
+echo "Patched Depends:  $(grep '^Depends:' $EXTRACT_DIR/DEBIAN/control)"
+
+# Repack
+rm "$DEB_FILE"
+fakeroot dpkg-deb -b "$EXTRACT_DIR" "$DEB_FILE"
+
 echo "Deb built!"
+ls -al
+rm -rf "$EXTRACT_DIR"
+
 ls -al
 rm -rf release
 mkdir release
