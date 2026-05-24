@@ -64,7 +64,7 @@ rm -rf $NAME
   --app-version "$VERSION" \
   --icon "$ICON" \
   --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,jdk.crypto.ec,jdk.crypto.cryptoki,jdk.crypto.mscapi  \
-  --java-options '--enable-native-access=javafx.graphics -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
+  --java-options '--enable-native-access=javafx.graphics '
   
 echo "Zipping standalone version"
 rm -rf *.zip
@@ -84,7 +84,7 @@ echo "Building Local installer"
   --win-menu \
   --win-dir-chooser \
   --win-per-user-install \
-  --java-options '--enable-native-access=javafx.graphics -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
+  --java-options '--enable-native-access=javafx.graphics '
   
 echo "Building system wide installer" 
   
