@@ -4,7 +4,7 @@ NAME=CaDoodle
 VERSION=0.0.1
 MAIN=com.commonwealthrobotics.Main
 
-sudo apt install fuse
+sudo apt install fuse3
 
 if [[ -z "${VERSION_SEMVER}" ]]; then
   VERSION=4.0.4
@@ -93,6 +93,20 @@ echo "Testing executable:"
 #./$NAME-$ARCH.AppImage one two
 echo "Building .deb..."
 rm -rf *.deb
+rm -rf deb-resources
+# Create jpackage resource dir with explicit minimal deps
+mkdir -p deb-resources
+cat << 'EOF' > deb-resources/control
+Package: PACKAGE_NAME
+Version: PACKAGE_VERSION
+Section: misc
+Priority: optional
+Architecture: PACKAGE_ARCH
+Maintainer: MAINTAINER_VAL
+Description: DESCRIPTION_VAL
+Depends: libc6 (>= 2.17), libgcc-s1, libstdc++6
+EOF
+
 $JAVA_HOME/bin/jpackage --input $BUILDDIR \
   --name $NAME \
   --main-jar $TARGETJAR \
