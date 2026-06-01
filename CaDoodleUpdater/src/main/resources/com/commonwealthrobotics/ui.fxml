@@ -118,10 +118,25 @@
                         <Image url="@SourceIcon.png" />
                      </image>
                   </ImageView>
-                  <HBox fx:id="initialStartupControls" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                  <HBox fx:id="initialStartupControls" alignment="CENTER_LEFT" spacing="20.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                      <children>
-                        <Label text="Label" />
+                        <Label text="First Time Launch" />
+                        <Button fx:id="uptodateButton" mnemonicParsing="false" onAction="#onYes" text="Keep Up To Date">
+                           <styleClass>
+                              <String fx:value="image-button" />
+                              <String fx:value="image-button-focus" />
+                           </styleClass>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#onExtractLTS" text="Use LTS (No Internet)">
+                           <styleClass>
+                              <String fx:value="image-button" />
+                              <String fx:value="image-button-focus" />
+                           </styleClass>
+                        </Button>
                      </children>
+                     <padding>
+                        <Insets left="20.0" top="20.0" />
+                     </padding>
                   </HBox>
                </children>
             </GridPane>

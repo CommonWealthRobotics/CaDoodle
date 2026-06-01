@@ -17,7 +17,7 @@ public class Main  extends Application {
 		CadoodleUpdater.stage=stage;
 		Parent root = FXMLLoader.load(Main.class.getResource("ui.fxml"));
 
-		Scene scene = new Scene(root, 620, 658);
+		Scene scene = new Scene(root, 650, 750);
 		stage.setOnCloseRequest(event -> {
 			Platform.exit();
 			System.exit(0);
