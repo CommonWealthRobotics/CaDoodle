@@ -29,6 +29,15 @@ jobs:
           distribution: temurin
           java-version: 24
 
+      - name: Get the version
+        id: get_version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=0.0.0" >> $GITHUB_OUTPUT
+          fi
+
       - name: Download jvm.json and CaDoodle-ApplicationInstall.zip
         run: |
           curl -L "${{ env.JVM_JSON_URL }}" -o jvm.json
@@ -46,6 +55,8 @@ jobs:
           echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
 
       - name: Build
+        env:
+          VERSION_SEMVER: ${{ steps.get_version.outputs.VERSION }}
         run: bash package-linux_arm64.sh
 
       - name: Upload math result for job Linux
@@ -62,7 +73,12 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=0.0.0" >> $GITHUB_OUTPUT
+          fi
 
       - name: Download jvm.json and CaDoodle-ApplicationInstall.zip
         run: |
@@ -99,7 +115,12 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=0.0.0" >> $GITHUB_OUTPUT
+          fi
 
       - name: Download jvm.json and CaDoodle-ApplicationInstall.zip
         run: |
@@ -140,7 +161,12 @@ jobs:
       - name: Get the version
         id: get_version
         shell: bash
-        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=0.0.0" >> $GITHUB_OUTPUT
+          fi
 
       - name: Download jvm.json and CaDoodle-ApplicationInstall.zip
         shell: bash
@@ -180,7 +206,12 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=0.0.0" >> $GITHUB_OUTPUT
+          fi
 
       - name: Download jvm.json and CaDoodle-ApplicationInstall.zip
         run: |
@@ -217,7 +248,12 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=0.0.0" >> $GITHUB_OUTPUT
+          fi
 
       - name: Download jvm.json and CaDoodle-ApplicationInstall.zip
         run: |
