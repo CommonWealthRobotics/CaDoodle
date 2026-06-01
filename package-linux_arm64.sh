@@ -38,7 +38,7 @@ JAR_NAME=CaDoodleUpdater.jar
 echo "Test jar complete"
 ls -al $JAVA_HOME
 
-cp zulu*-linux_aarch64.tar.gz $DIR/
+cp zulu*jre*-linux_aarch64.tar.gz $DIR/
 cp CaDoodle-ApplicationInstall.zip $DIR/
 
 ICON=$NAME.png

@@ -49,7 +49,7 @@ magick your_image_16.png your_image_32.png your_image_48.png your_image_64.png y
 PACKAGE="$JAVA_HOME/bin/jpackage.exe"
 mkdir -p "$INPUT_DIR"
 cp "$DIR/$JAR_NAME" "$INPUT_DIR/"
-cp zulu*-win_x64.zip "$INPUT_DIR/"
+cp zulu*jre*-win_x64.zip "$INPUT_DIR/"
 cp CaDoodle-ApplicationInstall.zip "$INPUT_DIR/"
 
 #$PACKAGE --input "$INPUT_DIR/" --name "$NAME" --main-jar "$JAR_NAME" --app-version "$VERSION" --icon "$ICON" --type "exe" --resource-dir "temp2" --verbose
