@@ -121,7 +121,7 @@ public class CadoodleUpdater {
 		progressBar.setDisable(false);
 		infoBar.setText("Downloading CaDoodle Application, please wait...");
 		progressLabel.setText("Downloading 0.0%");
-		initialStartupControls.setVisible(true);
+		initialStartupControls.setVisible(false);
 		new Thread(() -> {
 
 			boolean downloadFailed = false;
@@ -437,6 +437,7 @@ public class CadoodleUpdater {
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void onExtractLTS(ActionEvent ev) {
+		initialStartupControls.setVisible(false);
 		new Thread(() -> {
 			bindir = System.getProperty("user.home") + "/bin/" + repoName + "Install/";
 			myVersionFileString = bindir + "currentversion.txt";
@@ -453,7 +454,7 @@ public class CadoodleUpdater {
 			try {
 				Path jarDir = Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI())
 						.getParent();
-
+				System.out.println("Jar located in " + jarDir);
 				Path bundledZip = jarDir.resolve("CaDoodle-ApplicationInstall.zip");
 
 				Path jvmArchive = null;
@@ -468,7 +469,8 @@ public class CadoodleUpdater {
 				}
 				if (jvmArchive == null)
 					throw new IllegalStateException("No bundled JVM found in " + jarDir);
-
+				System.out.println("Found zip " + bundledZip);
+				System.out.println("Found JVM " + jvmArchive);
 				// 1. Extract CaDoodle-ApplicationInstall.zip into $HOME/bin/
 				Path homebin = Path.of(System.getProperty("user.home"), "bin");
 				Files.createDirectories(homebin);
@@ -494,15 +496,15 @@ public class CadoodleUpdater {
 				Files.createDirectories(installDir);
 				Files.copy(jvmArchive, installDir.resolve(jvmArchive.getFileName()),
 						StandardCopyOption.REPLACE_EXISTING);
+				myVersionString = new String(Files.readAllBytes(Paths.get(myVersionFileString))).trim();
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				onYes(null);
+				//onYes(null);
 				return;
 			}
-
-			onNo(null);
+			Platform.runLater(() -> onNo(null));
 		}).start();
 	}
 
