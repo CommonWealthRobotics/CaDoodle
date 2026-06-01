@@ -546,9 +546,11 @@ public class CadoodleUpdater {
 
 		if (!myVersionFile.exists()) {
 			initialStartupControls.setVisible(true);
-			uptodateButton.setDisable(noInternet);
+			// uptodateButton.setDisable(noInternet);
 			yesButton.setVisible(false);
 			noButton.setVisible(false);
+			if(noInternet)
+				onExtractLTS(null);
 			return;
 		} else {
 			initialStartupControls.setVisible(false);
