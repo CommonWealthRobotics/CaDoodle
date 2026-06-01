@@ -21,11 +21,11 @@ export JAVA_HOME="$HOME/bin/java25/"
 if test -d "$JAVA_HOME/$JVM/"; then
   echo "$JAVA_HOME exists."
 else
-	mkdir -p "$JAVA_HOME"
-	curl https://cdn.azul.com/zulu/bin/$ZIP -o $ZIP
-	#unzip $ZIP -d $JAVA_HOME
-	7z x $ZIP -o"$JAVA_HOME"
-	mv "$JAVA_HOME/$JVM/"* "$JAVA_HOME/"
+  mkdir -p "$JAVA_HOME"
+  curl https://cdn.azul.com/zulu/bin/$ZIP -o $ZIP
+  #unzip $ZIP -d $JAVA_HOME
+  7z x $ZIP -o"$JAVA_HOME"
+  mv "$JAVA_HOME/$JVM/"* "$JAVA_HOME/"
 fi
 echo "Compile with gradle"
 ./gradlew shadowJar
@@ -35,9 +35,6 @@ INPUT_DIR="$SCRIPT_DIR/input"
 JAR_NAME=CaDoodleUpdater.jar
 #$JAVA_HOME/bin/java.exe -jar $DIR/$JAR_NAME
 echo "Test jar complete"
-
-cp zulu*-win_x64.zip "$DIR/"
-cp CaDoodle-ApplicationInstall.zip "$DIR/"
 
 ICON=$NAME.ico
 magick SourceIcon.png -resize 256x256 your_image_256.png
@@ -52,6 +49,8 @@ magick your_image_16.png your_image_32.png your_image_48.png your_image_64.png y
 PACKAGE="$JAVA_HOME/bin/jpackage.exe"
 mkdir -p "$INPUT_DIR"
 cp "$DIR/$JAR_NAME" "$INPUT_DIR/"
+cp zulu*-win_x64.zip "$INPUT_DIR/"
+cp CaDoodle-ApplicationInstall.zip "$INPUT_DIR/"
 
 #$PACKAGE --input "$INPUT_DIR/" --name "$NAME" --main-jar "$JAR_NAME" --app-version "$VERSION" --icon "$ICON" --type "exe" --resource-dir "temp2" --verbose
 #exit 1
