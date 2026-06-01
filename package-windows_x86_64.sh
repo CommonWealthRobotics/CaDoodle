@@ -36,6 +36,9 @@ JAR_NAME=CaDoodleUpdater.jar
 #$JAVA_HOME/bin/java.exe -jar $DIR/$JAR_NAME
 echo "Test jar complete"
 
+cp zulu*-win_x64.zip "$DIR/"
+cp CaDoodle-ApplicationInstall.zip "$DIR/"
+
 ICON=$NAME.ico
 magick SourceIcon.png -resize 256x256 your_image_256.png
 magick SourceIcon.png -resize 128x128 your_image_128.png
