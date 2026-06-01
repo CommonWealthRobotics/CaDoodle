@@ -49,8 +49,8 @@ jobs:
           JVM_URL=$(jq -r '.["Linux-aarch64"].url' jvm.json)
           JVM_TYPE=$(jq -r '.["Linux-aarch64"].type' jvm.json)
           echo "Downloading $JVM_URL$JVM_NAME.$JVM_TYPE"
-          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "jvm.$JVM_TYPE"
-          tar -xzf "jvm.$JVM_TYPE"
+          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "$JVM_NAME.$JVM_TYPE"
+          tar -xzf "$JVM_NAME.$JVM_TYPE"
           echo "JAVA_HOME=$(pwd)/$JVM_NAME" >> $GITHUB_ENV
           echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
 
@@ -91,8 +91,8 @@ jobs:
           JVM_URL=$(jq -r '.["Linux-aarch64"].url' jvm.json)
           JVM_TYPE=$(jq -r '.["Linux-aarch64"].type' jvm.json)
           echo "Downloading $JVM_URL$JVM_NAME.$JVM_TYPE"
-          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "jvm.$JVM_TYPE"
-          tar -xzf "jvm.$JVM_TYPE"
+          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "$JVM_NAME.$JVM_TYPE"
+          tar -xzf "$JVM_NAME.$JVM_TYPE"
           echo "JAVA_HOME=$(pwd)/$JVM_NAME" >> $GITHUB_ENV
           echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
 
@@ -133,8 +133,8 @@ jobs:
           JVM_URL=$(jq -r '.["Linux-x64"].url' jvm.json)
           JVM_TYPE=$(jq -r '.["Linux-x64"].type' jvm.json)
           echo "Downloading $JVM_URL$JVM_NAME.$JVM_TYPE"
-          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "jvm.$JVM_TYPE"
-          tar -xzf "jvm.$JVM_TYPE"
+          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "$JVM_NAME.$JVM_TYPE"
+          tar -xzf "$JVM_NAME.$JVM_TYPE"
           echo "JAVA_HOME=$(pwd)/$JVM_NAME" >> $GITHUB_ENV
           echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
 
@@ -181,8 +181,8 @@ jobs:
           JVM_URL=$(jq -r '.["Windows-x64"].url' jvm.json)
           JVM_TYPE=$(jq -r '.["Windows-x64"].type' jvm.json)
           echo "Downloading $JVM_URL$JVM_NAME.$JVM_TYPE"
-          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "jvm.$JVM_TYPE"
-          unzip -q "jvm.$JVM_TYPE"
+          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "$JVM_NAME.$JVM_TYPE"
+          unzip -q "$JVM_NAME.$JVM_TYPE"
           echo "JAVA_HOME=$(pwd)/$JVM_NAME" >> $GITHUB_ENV
           echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
 
@@ -224,8 +224,8 @@ jobs:
           JVM_URL=$(jq -r '.["Mac-aarch64"].url' jvm.json)
           JVM_TYPE=$(jq -r '.["Mac-aarch64"].type' jvm.json)
           echo "Downloading $JVM_URL$JVM_NAME.$JVM_TYPE"
-          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "jvm.$JVM_TYPE"
-          unzip -q "jvm.$JVM_TYPE"
+          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "$JVM_NAME.$JVM_TYPE"
+          unzip -q "$JVM_NAME.$JVM_TYPE"
           echo "JAVA_HOME=$(pwd)/$JVM_NAME" >> $GITHUB_ENV
           echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
 
@@ -266,8 +266,8 @@ jobs:
           JVM_URL=$(jq -r '.["Mac-x64"].url' jvm.json)
           JVM_TYPE=$(jq -r '.["Mac-x64"].type' jvm.json)
           echo "Downloading $JVM_URL$JVM_NAME.$JVM_TYPE"
-          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "jvm.$JVM_TYPE"
-          unzip -q "jvm.$JVM_TYPE"
+          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "$JVM_NAME.$JVM_TYPE"
+          unzip -q "$JVM_NAME.$JVM_TYPE"
           echo "JAVA_HOME=$(pwd)/$JVM_NAME" >> $GITHUB_ENV
           echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
 
