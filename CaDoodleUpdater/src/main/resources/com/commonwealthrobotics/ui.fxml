@@ -10,25 +10,26 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="658.0" prefWidth="611.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.commonwealthrobotics.CadoodleUpdater">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="749.0" prefWidth="649.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.commonwealthrobotics.CadoodleUpdater">
    <children>
       <GridPane layoutX="184.0" layoutY="235.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints maxHeight="426.0" minHeight="10.0" prefHeight="426.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="331.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="543.0" minHeight="10.0" prefHeight="539.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="331.0" minHeight="10.0" prefHeight="84.0" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="84.0" minHeight="10.0" prefHeight="84.0" vgrow="NEVER" />
           <RowConstraints maxHeight="42.0" minHeight="10.0" prefHeight="42.0" vgrow="NEVER" />
         </rowConstraints>
          <children>
             <AnchorPane prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="3">
                <children>
-                  <ProgressBar fx:id="progressBar" progress="0.0" disable="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0" />
+                  <ProgressBar fx:id="progressBar" disable="true" progress="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0" />
                   <Label fx:id="progressLabel" alignment="CENTER" style="-fx-text-fill: black; -fx-effect: dropshadow(gaussian, white, 2, 0.5, 1, 1);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <font>
                         <Font size="20.0" />
@@ -57,7 +58,7 @@
                            </font></Button>
                      </children>
                   </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1"  style="-fx-padding: 0 2 2 2;">
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-padding: 0 2 2 2;" GridPane.columnIndex="1">
                      <children>
                         <Button fx:id="noButton" mnemonicParsing="false" onAction="#onNo" text="Keep it the way it was" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <styleClass>
@@ -73,37 +74,38 @@
             </GridPane>
             <GridPane>
               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="351.0" minWidth="10.0" prefWidth="312.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="368.0" minWidth="10.0" prefWidth="337.0" />
               </columnConstraints>
               <rowConstraints>
                   <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="117.0" minHeight="10.0" prefHeight="117.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="117.0" minHeight="10.0" prefHeight="117.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="39.0" minHeight="10.0" prefHeight="37.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Installed version" GridPane.rowIndex="2">
+                  <Label text="Installed version" GridPane.rowIndex="3">
                      <GridPane.margin>
                         <Insets left="20.0" right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="Latest version" GridPane.rowIndex="3">
+                  <Label text="Latest version" GridPane.rowIndex="4">
                      <GridPane.margin>
                         <Insets left="20.0" right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label fx:id="previousVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <Label fx:id="previousVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <GridPane.margin>
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label fx:id="currentVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                  <Label fx:id="currentVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <GridPane.margin>
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label fx:id="binary" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <Label fx:id="binary" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <opaqueInsets>
                         <Insets left="20.0" />
                      </opaqueInsets>
@@ -116,6 +118,11 @@
                         <Image url="@SourceIcon.png" />
                      </image>
                   </ImageView>
+                  <HBox fx:id="initialStartupControls" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                     <children>
+                        <Label text="Label" />
+                     </children>
+                  </HBox>
                </children>
             </GridPane>
             <Label fx:id="infoBar" text="-" GridPane.rowIndex="1">

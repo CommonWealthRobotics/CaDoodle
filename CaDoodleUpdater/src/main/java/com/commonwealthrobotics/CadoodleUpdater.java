@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 
@@ -56,7 +57,9 @@ public class CadoodleUpdater {
 	public static long sizeOfZip = 0;
 	@FXML // ResourceBundle that was given to the FXMLLoader
 	private ResourceBundle resources;
-
+	@FXML
+	private HBox initialStartupControls;
+	
 	@FXML // URL location of the FXML file that was given to the FXMLLoader
 	private URL location;
 
@@ -462,9 +465,14 @@ public class CadoodleUpdater {
 			bindirFile.mkdirs();
 
 		if (!myVersionFile.exists()) {
-			onYes(null);
+			initialStartupControls.setVisible(true);
+			yesButton.setVisible(false);
+			noButton.setVisible(false);
 			return;
 		} else {
+			initialStartupControls.setVisible(false);
+			yesButton.setVisible(true);
+			noButton.setVisible(true);
 			try {
 				myVersionString = new String(Files.readAllBytes(Paths.get(myVersionFileString))).trim();
 				previousVersion.setText(myVersionString);
