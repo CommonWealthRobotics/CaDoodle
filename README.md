@@ -62,7 +62,7 @@ Open the CaDoodleUpdater directory.
 
 When VS Code asks to use Gradle or Maven, select Gradle.
 
-To build the JAR file the Azul 17 Java-JavaFX JVM is required, it can be found here:
+To build the JAR file the Azul 25 Java-JavaFX JVM is required, it can be found here:
 https://www.azul.com/downloads/?version=java-17-lts&package=jdk-fx#zulu
 
 Supported platforms are Windows-x64, Linux-x64, Linux-ARM, Mac-x64 and Mac-ARM.
@@ -80,3 +80,16 @@ The java executable (java or java.exe) should be located in:
 
 Select the Gradle extension (elephant icon on the left), then select "CaDoodleUpdater/Tasks/build/build" to build the Jar file.
 The CaDoodleUpdater.jar file will be located in "CaDoodleUpdater\build\libs"
+
+
+# Plugins 
+
+the list of plugind needed are:
+
+https://github.com/CommonWealthRobotics/ExternalEditorsBowlerStudio
+
+Check out the content of the .json files for exact URLs and versions
+
+Plugins can also be installed nativly on the system and CaDoodle will find them installed there. THis is the best choice for all of the MacOS plugins because of the security restrictions on applications. 
+
+
