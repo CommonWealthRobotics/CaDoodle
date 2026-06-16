@@ -98,7 +98,9 @@ VERSION_QUAD="$VERSION.0"
 sed -i "s/Version=\"1.0.0.0\"/Version=\"$VERSION_QUAD\"/" MsixStage/AppxManifest.xml
 
 # Build the MSIX
-MAKEAPPX="C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x64/makeappx.exe"
+MAKEAPPX=$(find "C:/Program Files (x86)/Windows Kits/10/bin" -name "makeappx.exe" -path "*/x64/*" | sort -V | tail -1)
+echo "Found makeappx at: $MAKEAPPX"
+
 "$MAKEAPPX" pack /d MsixStage /p "$NAME-$VERSION.msix" /nv
 
 cp "$NAME-$VERSION.msix" "release/$NAME-Windows-$ARCH.msix"
