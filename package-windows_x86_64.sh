@@ -105,7 +105,7 @@ MAKEAPPX=$(find "C:/Program Files (x86)/Windows Kits/10/bin" -name "makeappx.exe
 echo "Found makeappx at: $MAKEAPPX"
 powershell.exe -Command "& '$MAKEAPPX' pack /d MsixStage /p $NAME-$VERSION.msix /nv /o"
 
-cp "$NAME-$VERSION.msix" "release/$NAME-Windows-$ARCH.msix"
+cp "$NAME-$VERSION.msix" "$NAME-Windows-$ARCH.msix"
 
 
 echo "Building Local installer" 
@@ -140,10 +140,6 @@ echo "Building system wide installer"
   --win-menu \
   --win-dir-chooser \
   --java-options '--enable-native-access=javafx.graphics -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
-  
-
-
-
-#cp $NAME-$VERSION.exe release/$NAME-Windows-$ARCH.exe
-#cp $NAME-System-$VERSION.exe release/$NAME-Windows-System-$ARCH.exe
-#cp $NAME-$VERSION.zip release/$NAME-Windows-$ARCH.zip
+cp $NAME-$VERSION.exe release/$NAME-Windows-$ARCH.exe
+cp $NAME-System-$VERSION.exe release/$NAME-Windows-System-$ARCH.exe
+cp $NAME-$VERSION.zip release/$NAME-Windows-$ARCH.zip
