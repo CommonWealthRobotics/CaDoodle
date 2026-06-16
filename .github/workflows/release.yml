@@ -187,7 +187,7 @@ jobs:
           echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
       - name: Patch publisher into manifest
         shell: bash
-          run: sed -i "s/WINDOWS_PUB_UUID/${{ secrets.WINDOWS_PUB_UUID }}/" AppxManifest.xml
+        run: sed -i "s/WINDOWS_PUB_UUID/${{ secrets.WINDOWS_PUB_UUID }}/" AppxManifest.xml
       - name: Build
         env:
           VERSION_SEMVER: ${{ steps.get_version.outputs.VERSION }}
