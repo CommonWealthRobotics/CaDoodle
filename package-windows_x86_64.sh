@@ -95,7 +95,7 @@ cp Assets/Wide310x150Logo.png MsixStage/Assets/
 
 # Patch version into manifest
 VERSION_QUAD="$VERSION.0"
-sed -i "s/Version=\"1.0.0.0\"/Version=\"$VERSION_QUAD\"/" MsixStage/AppxManifest.xml
+#sed -i "s/Version=\"1.0.0.0\"/Version=\"$VERSION_QUAD\"/" MsixStage/AppxManifest.xml
 
 # Build the MSIX
 #MAKEAPPX=$(find "C:/Program Files (x86)/Windows Kits/10/bin" -name "makeappx.exe" -path "*/x64/*" | sort -V | tail -1)

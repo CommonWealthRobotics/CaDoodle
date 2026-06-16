@@ -22,7 +22,67 @@
 	</Dependencies>
 
 	<Resources>
+		<Resource Language="am-et" />
+		<Resource Language="ar-sa" />
+		<Resource Language="az-latn-az" />
+		<Resource Language="bg-bg" />
+		<Resource Language="bn-in" />
+		<Resource Language="ca-es" />
+		<Resource Language="cs-cz" />
+		<Resource Language="da-dk" />
+		<Resource Language="de-de" />
+		<Resource Language="el-gr" />
 		<Resource Language="en-us" />
+		<Resource Language="es-es" />
+		<Resource Language="et-ee" />
+		<Resource Language="fa-ir" />
+		<Resource Language="fi-fi" />
+		<Resource Language="fr-fr" />
+		<Resource Language="gu-in" />
+		<Resource Language="ha-ng" />
+		<Resource Language="hi-in" />
+		<Resource Language="hu-hu" />
+		<Resource Language="hy-am" />
+		<Resource Language="id-id" />
+		<Resource Language="ig-ng" />
+		<Resource Language="it-it" />
+		<Resource Language="ja-jp" />
+		<Resource Language="ka-ge" />
+		<Resource Language="kk-kz" />
+		<Resource Language="km-kh" />
+		<Resource Language="ko-kr" />
+		<Resource Language="lt-lt" />
+		<Resource Language="lv-lv" />
+		<Resource Language="ml-in" />
+		<Resource Language="ms-my" />
+		<Resource Language="my-mm" />
+		<Resource Language="ne-np" />
+		<Resource Language="nl-nl" />
+		<Resource Language="nb-no" />
+		<Resource Language="or-in" />
+		<Resource Language="pa-in" />
+		<Resource Language="pl-pl" />
+		<Resource Language="ps-af" />
+		<Resource Language="pt-br" />
+		<Resource Language="ro-ro" />
+		<Resource Language="ru-ru" />
+		<Resource Language="sd-arab-pk" />
+		<Resource Language="si-lk" />
+		<Resource Language="sk-sk" />
+		<Resource Language="sq-al" />
+		<Resource Language="sr-latn-rs" />
+		<Resource Language="sv-se" />
+		<Resource Language="sw-ke" />
+		<Resource Language="ta-in" />
+		<Resource Language="te-in" />
+		<Resource Language="th-th" />
+		<Resource Language="tl-ph" />
+		<Resource Language="tr-tr" />
+		<Resource Language="uk-ua" />
+		<Resource Language="ur-pk" />
+		<Resource Language="vi-vn" />
+		<Resource Language="yo-ng" />
+		<Resource Language="zh-cn" />
 	</Resources>
 
 	<Applications>
