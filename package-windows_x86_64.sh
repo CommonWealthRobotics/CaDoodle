@@ -98,10 +98,13 @@ VERSION_QUAD="$VERSION.0"
 sed -i "s/Version=\"1.0.0.0\"/Version=\"$VERSION_QUAD\"/" MsixStage/AppxManifest.xml
 
 # Build the MSIX
+#MAKEAPPX=$(find "C:/Program Files (x86)/Windows Kits/10/bin" -name "makeappx.exe" -path "*/x64/*" | sort -V | tail -1)
+#echo "Found makeappx at: $MAKEAPPX"
+#"$MAKEAPPX" pack /d MsixStage /p "$NAME-$VERSION.msix" /nv
 MAKEAPPX=$(find "C:/Program Files (x86)/Windows Kits/10/bin" -name "makeappx.exe" -path "*/x64/*" | sort -V | tail -1)
-echo "Found makeappx at: $MAKEAPPX"
-
-"$MAKEAPPX" pack /d MsixStage /p "$NAME-$VERSION.msix" /nv
+MAKEAPPX_WIN=$(cygpath -w "$MAKEAPPX")
+echo "Found makeappx at: $MAKEAPPX_WIN"
+cmd //c "\"$MAKEAPPX_WIN\" pack /d MsixStage /p $NAME-$VERSION.msix /nv /o"
 
 cp "$NAME-$VERSION.msix" "release/$NAME-Windows-$ARCH.msix"
 
