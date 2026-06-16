@@ -193,7 +193,7 @@ jobs:
           VERSION_SEMVER: ${{ steps.get_version.outputs.VERSION }}
         shell: bash
         run: bash package-windows_x86_64.sh
-      - name: Upload result for job Windows
+      - name: Upload MSIX for job Windows
         uses: actions/upload-artifact@v4
         with:
           name: win-msix
