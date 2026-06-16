@@ -52,6 +52,7 @@ cp "$DIR/$JAR_NAME" "$INPUT_DIR/"
 cp zulu*jre*-win_x64.zip "$INPUT_DIR/"
 cp CaDoodle-ApplicationInstall.zip "$INPUT_DIR/"
 
+export ARCH=x86_64
 #$PACKAGE --input "$INPUT_DIR/" --name "$NAME" --main-jar "$JAR_NAME" --app-version "$VERSION" --icon "$ICON" --type "exe" --resource-dir "temp2" --verbose
 #exit 1
 rm -rf temp*
@@ -104,25 +105,32 @@ echo "Building system wide installer"
   --win-dir-chooser \
   --java-options '--enable-native-access=javafx.graphics -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
   
-"$PACKAGE" --input "$INPUT_DIR/" \
-  --name "$NAME" \
-  --main-jar "$JAR_NAME" \
-  --main-class "$MAIN" \
-  --type "msi" \
-  --temp "temp4" \
-  --app-version "$VERSION" \
-  --icon "$ICON" \
-  --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,jdk.crypto.ec,jdk.crypto.cryptoki,jdk.crypto.mscapi \
-  --win-shortcut \
-  --win-menu \
-  --win-dir-chooser \
-  --java-options '--enable-native-access=javafx.graphics'
+echo "Building MSIX"
+mkdir -p MsixStage/Assets
+
+# Copy app-image contents
+cp -r "$NAME/"* MsixStage/
+
+# Copy manifest and assets
+cp AppxManifest.xml MsixStage/
+cp Assets/StoreLogo.png MsixStage/Assets/
+cp Assets/Square44x44Logo.png MsixStage/Assets/
+cp Assets/Square150x150Logo.png MsixStage/Assets/
+cp Assets/Wide310x150Logo.png MsixStage/Assets/
+
+# Patch version into manifest
+VERSION_QUAD="$VERSION.0"
+sed -i "s/Version=\"1.0.0.0\"/Version=\"$VERSION_QUAD\"/" MsixStage/AppxManifest.xml
+
+# Build the MSIX
+MAKEAPPX="C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x64/makeappx.exe"
+"$MAKEAPPX" pack /d MsixStage /p "$NAME-$VERSION.msix" /nv
+
+cp "$NAME-$VERSION.msix" "release/$NAME-Windows-$ARCH.msix"
 
 ls -al
 rm -rf release
 mkdir release
-export ARCH=x86_64
-cp $NAME-$VERSION.msi release/$NAME-Windows-$ARCH.msi  
-cp $NAME-$VERSION.exe release/$NAME-Windows-$ARCH.exe
-cp $NAME-System-$VERSION.exe release/$NAME-Windows-System-$ARCH.exe
-cp $NAME-$VERSION.zip release/$NAME-Windows-$ARCH.zip
+#cp $NAME-$VERSION.exe release/$NAME-Windows-$ARCH.exe
+#cp $NAME-System-$VERSION.exe release/$NAME-Windows-System-$ARCH.exe
+#cp $NAME-$VERSION.zip release/$NAME-Windows-$ARCH.zip
