@@ -53,6 +53,9 @@ cp zulu*jre*-win_x64.zip "$INPUT_DIR/"
 cp CaDoodle-ApplicationInstall.zip "$INPUT_DIR/"
 
 export ARCH=x86_64
+ls -al
+rm -rf release
+mkdir release
 #$PACKAGE --input "$INPUT_DIR/" --name "$NAME" --main-jar "$JAR_NAME" --app-version "$VERSION" --icon "$ICON" --type "exe" --resource-dir "temp2" --verbose
 #exit 1
 rm -rf temp*
@@ -72,6 +75,35 @@ rm -rf $NAME
 echo "Zipping standalone version"
 rm -rf *.zip
 7z a $NAME-$VERSION.zip "$NAME/"
+
+echo "Building MSIX"
+mkdir -p MsixStage/Assets
+mkdir -p Assets
+magick SourceIcon.png -resize 50x50 Assets/StoreLogo.png
+magick SourceIcon.png -resize 44x44 Assets/Square44x44Logo.png
+magick SourceIcon.png -resize 150x150 Assets/Square150x150Logo.png
+magick SourceIcon.png -resize 310x150 -gravity center -background transparent -extent 310x150 Assets/Wide310x150Logo.png
+# Copy app-image contents
+cp -r "$NAME/"* MsixStage/
+
+# Copy manifest and assets
+cp AppxManifest.xml MsixStage/
+cp Assets/StoreLogo.png MsixStage/Assets/
+cp Assets/Square44x44Logo.png MsixStage/Assets/
+cp Assets/Square150x150Logo.png MsixStage/Assets/
+cp Assets/Wide310x150Logo.png MsixStage/Assets/
+
+# Patch version into manifest
+VERSION_QUAD="$VERSION.0"
+sed -i "s/Version=\"1.0.0.0\"/Version=\"$VERSION_QUAD\"/" MsixStage/AppxManifest.xml
+
+# Build the MSIX
+MAKEAPPX="C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x64/makeappx.exe"
+"$MAKEAPPX" pack /d MsixStage /p "$NAME-$VERSION.msix" /nv
+
+cp "$NAME-$VERSION.msix" "release/$NAME-Windows-$ARCH.msix"
+
+
 echo "Building Local installer" 
 
 "$PACKAGE" --input "$INPUT_DIR/" \
@@ -105,32 +137,9 @@ echo "Building system wide installer"
   --win-dir-chooser \
   --java-options '--enable-native-access=javafx.graphics -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
   
-echo "Building MSIX"
-mkdir -p MsixStage/Assets
 
-# Copy app-image contents
-cp -r "$NAME/"* MsixStage/
 
-# Copy manifest and assets
-cp AppxManifest.xml MsixStage/
-cp Assets/StoreLogo.png MsixStage/Assets/
-cp Assets/Square44x44Logo.png MsixStage/Assets/
-cp Assets/Square150x150Logo.png MsixStage/Assets/
-cp Assets/Wide310x150Logo.png MsixStage/Assets/
 
-# Patch version into manifest
-VERSION_QUAD="$VERSION.0"
-sed -i "s/Version=\"1.0.0.0\"/Version=\"$VERSION_QUAD\"/" MsixStage/AppxManifest.xml
-
-# Build the MSIX
-MAKEAPPX="C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x64/makeappx.exe"
-"$MAKEAPPX" pack /d MsixStage /p "$NAME-$VERSION.msix" /nv
-
-cp "$NAME-$VERSION.msix" "release/$NAME-Windows-$ARCH.msix"
-
-ls -al
-rm -rf release
-mkdir release
 #cp $NAME-$VERSION.exe release/$NAME-Windows-$ARCH.exe
 #cp $NAME-System-$VERSION.exe release/$NAME-Windows-System-$ARCH.exe
 #cp $NAME-$VERSION.zip release/$NAME-Windows-$ARCH.zip
