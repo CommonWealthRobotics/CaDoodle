@@ -108,18 +108,21 @@ echo "Building system wide installer"
   --name "$NAME" \
   --main-jar "$JAR_NAME" \
   --main-class "$MAIN" \
-  --type "msix" \
+  --type "msi" \
   --temp "temp4" \
   --app-version "$VERSION" \
   --icon "$ICON" \
   --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,jdk.crypto.ec,jdk.crypto.cryptoki,jdk.crypto.mscapi \
+  --win-shortcut \
+  --win-menu \
+  --win-dir-chooser \
   --java-options '--enable-native-access=javafx.graphics'
 
 ls -al
 rm -rf release
 mkdir release
 export ARCH=x86_64
-cp $NAME-$VERSION.msix release/$NAME-Windows-$ARCH.msix  
+cp $NAME-$VERSION.msi release/$NAME-Windows-$ARCH.msi  
 cp $NAME-$VERSION.exe release/$NAME-Windows-$ARCH.exe
 cp $NAME-System-$VERSION.exe release/$NAME-Windows-System-$ARCH.exe
 cp $NAME-$VERSION.zip release/$NAME-Windows-$ARCH.zip
