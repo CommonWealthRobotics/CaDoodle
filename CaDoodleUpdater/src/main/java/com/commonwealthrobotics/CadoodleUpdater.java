@@ -23,7 +23,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,7 +48,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class CadoodleUpdater {
 	public static String[] argsFromSystem;
-	//public static String[] args;
+	// public static String[] args;
 	public static String project;
 	public static Stage stage;
 
@@ -218,17 +217,16 @@ public class CadoodleUpdater {
 				return;
 			}
 
-
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			//		
-			//		for (int i = 4; i < args.length; i++) {
-			//			command += " " + args[i];
-			//		}
+			//
+			// for (int i = 4; i < args.length; i++) {
+			// command += " " + args[i];
+			// }
 			try {
 				myVersionFile.createNewFile();
 			} catch (IOException e) {
@@ -439,8 +437,6 @@ public class CadoodleUpdater {
 	void onExtractLTS(ActionEvent ev) {
 		initialStartupControls.setVisible(false);
 		new Thread(() -> {
-			bindir = System.getProperty("user.home") + "/bin/" + repoName + "Install/";
-			myVersionFileString = bindir + "currentversion.txt";
 			String pinFileName = bindir + "pinVersion";
 			File pinFile = new File(pinFileName);
 			if (!pinFile.exists()) {
@@ -451,61 +447,64 @@ public class CadoodleUpdater {
 					e.printStackTrace();
 				}
 			}
-			try {
-				Path jarDir = Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-						.getParent();
-				System.out.println("Jar located in " + jarDir);
-				Path bundledZip = jarDir.resolve("CaDoodle-ApplicationInstall.zip");
-
-				Path jvmArchive = null;
-				String[] files = jarDir.toFile().list();
-				if (files != null) {
-					for (String s : files) {
-						if (s.startsWith("zulu") && s.contains("jre")) {
-							jvmArchive = jarDir.resolve(s);
-							break;
-						}
-					}
-				}
-				if (jvmArchive == null)
-					throw new IllegalStateException("No bundled JVM found in " + jarDir);
-				System.out.println("Found zip " + bundledZip);
-				System.out.println("Found JVM " + jvmArchive);
-				// 1. Extract CaDoodle-ApplicationInstall.zip into $HOME/bin/
-				Path homebin = Path.of(System.getProperty("user.home"), "bin");
-				Files.createDirectories(homebin);
-
-				try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(bundledZip))) {
-					ZipEntry entry;
-					while ((entry = zis.getNextEntry()) != null) {
-						Path target = homebin.resolve(entry.getName()).normalize();
-						if (!target.startsWith(homebin))
-							throw new SecurityException("Zip slip detected: " + entry.getName());
-						if (entry.isDirectory()) {
-							Files.createDirectories(target);
-						} else {
-							Files.createDirectories(target.getParent());
-							Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
-						}
-						zis.closeEntry();
-					}
-				}
-
-				// 2. Copy the JVM archive into $HOME/bin/CaDoodle-ApplicationInstall/
-				Path installDir = homebin.resolve("CaDoodle-ApplicationInstall");
-				Files.createDirectories(installDir);
-				Files.copy(jvmArchive, installDir.resolve(jvmArchive.getFileName()),
-						StandardCopyOption.REPLACE_EXISTING);
-				myVersionString = new String(Files.readAllBytes(Paths.get(myVersionFileString))).trim();
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				//onYes(null);
-				return;
-			}
 			Platform.runLater(() -> onNo(null));
 		}).start();
+	}
+
+	private void setupDefaultVersion() {
+		bindir = System.getProperty("user.home") + "/bin/" + repoName + "Install/";
+		myVersionFileString = bindir + "currentversion.txt";
+		try {
+			Path jarDir = Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+			System.out.println("Jar located in " + jarDir);
+			Path bundledZip = jarDir.resolve("CaDoodle-ApplicationInstall.zip");
+
+			Path jvmArchive = null;
+			String[] files = jarDir.toFile().list();
+			if (files != null) {
+				for (String s : files) {
+					if (s.startsWith("zulu") && s.contains("jre")) {
+						jvmArchive = jarDir.resolve(s);
+						break;
+					}
+				}
+			}
+			if (jvmArchive == null)
+				throw new IllegalStateException("No bundled JVM found in " + jarDir);
+			System.out.println("Found zip " + bundledZip);
+			System.out.println("Found JVM " + jvmArchive);
+			// 1. Extract CaDoodle-ApplicationInstall.zip into $HOME/bin/
+			Path homebin = Path.of(System.getProperty("user.home"), "bin");
+			Files.createDirectories(homebin);
+
+			try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(bundledZip))) {
+				ZipEntry entry;
+				while ((entry = zis.getNextEntry()) != null) {
+					Path target = homebin.resolve(entry.getName()).normalize();
+					if (!target.startsWith(homebin))
+						throw new SecurityException("Zip slip detected: " + entry.getName());
+					if (entry.isDirectory()) {
+						Files.createDirectories(target);
+					} else {
+						Files.createDirectories(target.getParent());
+						Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
+					}
+					zis.closeEntry();
+				}
+			}
+
+			// 2. Copy the JVM archive into $HOME/bin/CaDoodle-ApplicationInstall/
+			Path installDir = homebin.resolve("CaDoodle-ApplicationInstall");
+			Files.createDirectories(installDir);
+			Files.copy(jvmArchive, installDir.resolve(jvmArchive.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+			myVersionString = new String(Files.readAllBytes(Paths.get(myVersionFileString))).trim();
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			// onYes(null);
+			return;
+		}
 	}
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
@@ -545,12 +544,20 @@ public class CadoodleUpdater {
 			bindirFile.mkdirs();
 
 		if (!myVersionFile.exists()) {
-			initialStartupControls.setVisible(true);
-			// uptodateButton.setDisable(noInternet);
-			yesButton.setVisible(false);
-			noButton.setVisible(false);
-			if(noInternet)
-				onExtractLTS(null);
+			boolean MyNoInternet = noInternet;
+			initialStartupControls.setVisible(false);
+
+			new Thread(() -> {
+				setupDefaultVersion();
+				Platform.runLater(() -> {
+					initialStartupControls.setVisible(true);
+					// uptodateButton.setDisable(noInternet);
+					yesButton.setVisible(false);
+					noButton.setVisible(false);
+					if (MyNoInternet)
+						onExtractLTS(null);
+				});
+			}).start();
 			return;
 		} else {
 			initialStartupControls.setVisible(false);
