@@ -92,4 +92,6 @@ Check out the content of the .json files for exact URLs and versions
 
 Plugins can also be installed natively on the system and CaDoodle will find them installed there. This is the best choice for all of the MacOS plugins because of the security restrictions on applications. 
 
+# Apple Store
 
+Coming soon...
