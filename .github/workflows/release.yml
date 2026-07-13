@@ -298,23 +298,6 @@ jobs:
           else
             echo "VERSION=1.0.0" >> $GITHUB_OUTPUT
           fi
-
-      - name: Download jvm.json and CaDoodle-ApplicationInstall.zip
-        run: |
-          curl -L "${{ env.JVM_JSON_URL }}" -o jvm.json
-          curl -L "${{ env.APP_INSTALL_URL }}" -o CaDoodle-ApplicationInstall.zip
-
-      - name: Download JVM (Mac-x64)
-        run: |
-          JVM_NAME=$(jq -r '.["Mac-x64"].name' jvm.json)
-          JVM_URL=$(jq -r '.["Mac-x64"].url' jvm.json)
-          JVM_TYPE=$(jq -r '.["Mac-x64"].type' jvm.json)
-          echo "Downloading $JVM_URL$JVM_NAME.$JVM_TYPE"
-          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "$JVM_NAME.$JVM_TYPE"
-          unzip -q "$JVM_NAME.$JVM_TYPE"
-          echo "JAVA_HOME=$(pwd)/$JVM_NAME" >> $GITHUB_ENV
-          echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
-
       - name: Import Developer ID signing certificate
         env:
           MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
@@ -346,6 +329,23 @@ jobs:
           fi
           echo "$NOTARY_KEY_P8" | base64 --decode > "$RUNNER_TEMP/notary_key.p8"
           echo "NOTARY_KEY_PATH=$RUNNER_TEMP/notary_key.p8" >> "$GITHUB_ENV"
+
+      - name: Download jvm.json and CaDoodle-ApplicationInstall.zip
+        run: |
+          curl -L "${{ env.JVM_JSON_URL }}" -o jvm.json
+          curl -L "${{ env.APP_INSTALL_URL }}" -o CaDoodle-ApplicationInstall.zip
+
+      - name: Download JVM (Mac-x64)
+        run: |
+          JVM_NAME=$(jq -r '.["Mac-x64"].name' jvm.json)
+          JVM_URL=$(jq -r '.["Mac-x64"].url' jvm.json)
+          JVM_TYPE=$(jq -r '.["Mac-x64"].type' jvm.json)
+          echo "Downloading $JVM_URL$JVM_NAME.$JVM_TYPE"
+          curl -L "$JVM_URL$JVM_NAME.$JVM_TYPE" -o "$JVM_NAME.$JVM_TYPE"
+          unzip -q "$JVM_NAME.$JVM_TYPE"
+          echo "JAVA_HOME=$(pwd)/$JVM_NAME" >> $GITHUB_ENV
+          echo "$(pwd)/$JVM_NAME/bin" >> $GITHUB_PATH
+
 
       - name: Build
         env:
