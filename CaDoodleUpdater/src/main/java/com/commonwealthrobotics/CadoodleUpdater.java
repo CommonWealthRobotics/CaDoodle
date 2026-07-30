@@ -190,6 +190,7 @@ public class CadoodleUpdater {
 	}
 
 	private boolean launched = false;
+	private Path goloblaPinFile=null;
 
 	public void launchApplication() {
 		if (launched) {
@@ -458,6 +459,7 @@ public class CadoodleUpdater {
 			Path jarDir = Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
 			System.out.println("Jar located in " + jarDir);
 			Path bundledZip = jarDir.resolve("CaDoodle-ApplicationInstall.zip");
+			goloblaPinFile = jarDir.resolve("pinVersionSystem");
 
 			Path jvmArchive = null;
 			String[] files = jarDir.toFile().list();
@@ -546,15 +548,23 @@ public class CadoodleUpdater {
 		if (!myVersionFile.exists()) {
 			boolean MyNoInternet = noInternet;
 			initialStartupControls.setVisible(false);
-
+			
 			new Thread(() -> {
 				setupDefaultVersion();
+				boolean globalpin=false;
+				if(goloblaPinFile!=null) {
+					File gpinfile = goloblaPinFile.toFile();
+					if(gpinfile.exists()) {
+						globalpin=true;
+					}
+				}
+				boolean runDef  = MyNoInternet||globalpin;
 				Platform.runLater(() -> {
 					initialStartupControls.setVisible(true);
 					// uptodateButton.setDisable(noInternet);
 					yesButton.setVisible(false);
 					noButton.setVisible(false);
-					if (MyNoInternet)
+					if (runDef)
 						onExtractLTS(null);
 				});
 			}).start();
