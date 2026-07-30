@@ -126,7 +126,7 @@ echo "Building Local installer"
   --java-options '--enable-native-access=javafx.graphics '
   
 echo "Building system wide installer" 
-  
+touch "$INPUT_DIR/pinVersionSystem"
 "$PACKAGE" --input "$INPUT_DIR/" \
   --name "$NAME"-System \
   --main-jar "$JAR_NAME" \
