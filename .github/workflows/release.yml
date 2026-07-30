@@ -4,7 +4,7 @@ on:
 
 env:
   JVM_JSON_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/latest/download/jvm.json
-  APP_INSTALL_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/download/0.46.039/CaDoodle-ApplicationInstall.zip
+  APP_INSTALL_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/download/0.46.040/CaDoodle-ApplicationInstall.zip
 
 jobs:
   debian-bookworm:
