@@ -52,6 +52,22 @@ Open PowerShell (not cmd)
 & "Documents\CaDoodle-Windows-x86_64\CaDoodle\CaDoodle.exe" 2>&1 | Tee-Object -filePath Documents\output.txt
 ```
 
+# Plugins
+
+CaDoodle uses a set of plugins to extend capabilities. 
+
+Plugin bundles can be found here
+
+https://github.com/CommonWealthRobotics/bowler-script-kernel/releases
+
+### Pre-Install plugins
+
+The plugins zip file can be downloaded and pre-installed on the system. The zip file can be selected when the installer asks the user to select a file
+
+For system Administrators, the zip file for a given system can be downloaded and placed in the install directory next to `CaDoodle-ApplicationInstall.zip` . When this file is present, it will be auto selected on fresh installs, and when the globalPinVersion is set, then the user will automatically get the current plugins and LTS version of CaDoodle. 
+
+
+
 # Visual Studio Code building the Java JAR file
 
 To build the updater Java JAR file in Visual Studio Code install the following extensions:
