@@ -20,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.RadioButton;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
@@ -78,6 +79,18 @@ public class CadoodleUpdater {
 	private Label currentVersion; // Value injected by FXMLLoader
 	@FXML // fx:id="currentVersion"
 	private Label infoBar;
+	@FXML // fx:id="currentVersion"
+	private Label pluginFileLabel;
+	
+	@FXML // fx:id="currentVersion"
+	private
+	RadioButton downloadPlugins;	
+	@FXML // fx:id="currentVersion"
+	private
+	RadioButton useOsPlugins;
+	@FXML // fx:id="currentVersion"
+	private
+	RadioButton selectPluginFile;
 	@FXML // fx:id="yesButton"
 	private Button yesButton; // Value injected by FXMLLoader
 
