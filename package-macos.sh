@@ -14,10 +14,10 @@ ARCH=x86_64
 JVM=zulu25.32.21-ca-fx-jdk25.0.2-macosx_x64
 if [[ $(uname -m) == 'arm64' ]]; then
   ARCH=arm64
-  echo "M1 Mac detected https://cdn.azul.com/zulu/bin/zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64.tar.gz"
+  echo "Apple Silicon Mac detected https://cdn.azul.com/zulu/bin/zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64.tar.gz"
   JVM=zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64
 else
-  echo "x86 Mac detected https://cdn.azul.com/zulu/bin/zulu25.32.21-ca-fx-jdk25.0.2-macosx_x64.tar.gz"
+  echo "Intel Mac detected https://cdn.azul.com/zulu/bin/zulu25.32.21-ca-fx-jdk25.0.2-macosx_x64.tar.gz"
 
 fi
 set -e
@@ -43,6 +43,9 @@ echo "Test jar complete"
 
 cp zulu*jre*-macosx_*.zip $DIR/
 cp CaDoodle-ApplicationInstall.zip $DIR/
+if [[ $(uname -m) == 'arm64' ]]; then
+    cp BowlerStudioInstall.zip $DIR/
+fi
 
 ICON=$NAME.png
 cp SourceIcon.png $ICON
