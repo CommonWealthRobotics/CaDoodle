@@ -66,6 +66,50 @@ The plugins zip file can be downloaded and pre-installed on the system. The zip 
 
 For system Administrators, the zip file for a given system can be downloaded and placed in the install directory next to `CaDoodle-ApplicationInstall.zip` . When this file is present, it will be auto selected on fresh installs, and when the globalPinVersion is set, then the user will automatically get the current plugins and LTS version of CaDoodle. 
 
+### Mac Plugins
+
+```
+brew install --cask inkscape blender freecad meshlab openscad@snapshot
+```
+
+### Ubuntu Plugins
+
+```
+sudo apt update
+
+sudo apt install -y \
+    wget \
+    freecad \
+    inkscape \
+    blender \
+    meshlab
+
+wget -qO- https://files.openscad.org/OBS-Repository-Key.pub | \
+    sudo tee /etc/apt/trusted.gpg.d/obs-openscad-nightly.asc > /dev/null
+
+echo "deb https://download.opensuse.org/repositories/home:/t-paul/xUbuntu_26.04/ ./" | \
+    sudo tee /etc/apt/sources.list.d/openscad.list
+
+sudo apt update
+sudo apt install -y openscad-nightly
+```
+
+### Flatpack Plugins
+
+```
+sudo apt update
+sudo apt install -y flatpak
+
+sudo flatpak remote-add --if-not-exists flathub \
+    https://flathub.org/repo/flathub.flatpakrepo
+
+flatpak install -y flathub \
+    org.freecad.FreeCAD \
+    org.openscad.OpenSCAD \
+    org.inkscape.Inkscape \
+    org.blender.Blender
+    
+```
 
 
 # Visual Studio Code building the Java JAR file

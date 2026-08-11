@@ -5,7 +5,7 @@ on:
 env:
   JVM_JSON_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/latest/download/jvm.json
   APP_INSTALL_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/download/0.46.048/CaDoodle-ApplicationInstall.zip
-  BOWLER_KERNEL_VERSION: 3.1.8
+  BOWLER_KERNEL_VERSION: 3.1.9
   BOWLER_STUDIO_INSTALL_BASE_URL: https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download
 
 jobs:
