@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="749.0" prefWidth="649.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.commonwealthrobotics.CadoodleUpdater">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="867.0" prefWidth="756.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.commonwealthrobotics.CadoodleUpdater">
    <children>
       <GridPane layoutX="184.0" layoutY="235.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -81,33 +81,34 @@
               </columnConstraints>
               <rowConstraints>
                   <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="117.0" minHeight="10.0" prefHeight="117.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="135.0" minHeight="10.0" prefHeight="135.0" vgrow="SOMETIMES" />
+                  <RowConstraints vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="117.0" minHeight="10.0" prefHeight="117.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="39.0" minHeight="10.0" prefHeight="37.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Installed version" GridPane.rowIndex="3">
+                  <Label text="Installed version" GridPane.rowIndex="4">
                      <GridPane.margin>
                         <Insets left="20.0" right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label text="Latest version" GridPane.rowIndex="4">
+                  <Label text="Latest version" GridPane.rowIndex="5">
                      <GridPane.margin>
                         <Insets left="20.0" right="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label fx:id="previousVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                  <Label fx:id="previousVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <GridPane.margin>
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label fx:id="currentVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                  <Label fx:id="currentVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="5">
                      <GridPane.margin>
                         <Insets left="20.0" />
                      </GridPane.margin>
                   </Label>
-                  <Label fx:id="binary" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <Label fx:id="binary" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <opaqueInsets>
                         <Insets left="20.0" />
                      </opaqueInsets>
@@ -122,10 +123,10 @@
                   </ImageView>
                   <HBox fx:id="initialStartupControls" alignment="CENTER_LEFT" spacing="20.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                      <children>
-                        <GridPane hgap="10.0" vgap="10.0">
+                        <GridPane hgap="10.0" prefWidth="460.0" vgap="10.0">
                           <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                            <ColumnConstraints hgrow="NEVER" />
+                            <ColumnConstraints hgrow="NEVER" />
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                           </columnConstraints>
                           <rowConstraints>
@@ -150,20 +151,25 @@
                                  </styleClass>
                               </Button>
                               <Label text="Plugins:" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <RadioButton fx:id="downloadPlugins" mnemonicParsing="false" selected="true" text="Download All In Background" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                              <RadioButton fx:id="downloadPlugins" mnemonicParsing="false" onAction="#pluginOptionChange" selected="true" text="Download All In Background" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="plugins" />
                                  </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="useOsPlugins" mnemonicParsing="false" text="Use OS Only" toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <RadioButton fx:id="selectPluginFile" mnemonicParsing="false" text="Select File..." toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                              <Label fx:id="pluginFileLabel" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                              <RadioButton fx:id="useOsPlugins" mnemonicParsing="false" onAction="#pluginOptionChange" text="Use OS Only" toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                              <RadioButton fx:id="selectPluginFile" mnemonicParsing="false" onAction="#pluginOptionChange" text="Select File..." toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
                      </children>
                      <padding>
                         <Insets left="20.0" top="20.0" />
                      </padding>
+                  </HBox>
+                  <HBox fx:id="pluginFileBox" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                     <children>
+                        <Button fx:id="selectPluginFileButton" minWidth="84.0" mnemonicParsing="false" onAction="#onselectFile" prefHeight="26.0" prefWidth="84.0" text="Select..." />
+                        <Label fx:id="pluginFileLabel" />
+                     </children>
                   </HBox>
                </children>
             </GridPane>

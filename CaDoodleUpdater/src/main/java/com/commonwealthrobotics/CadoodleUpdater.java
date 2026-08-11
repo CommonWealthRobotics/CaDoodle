@@ -22,7 +22,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -62,6 +65,8 @@ public class CadoodleUpdater {
 	private ResourceBundle resources;
 	@FXML
 	private HBox initialStartupControls;
+	@FXML
+	private HBox pluginFileBox;
 
 	@FXML // URL location of the FXML file that was given to the FXMLLoader
 	private URL location;
@@ -81,16 +86,13 @@ public class CadoodleUpdater {
 	private Label infoBar;
 	@FXML // fx:id="currentVersion"
 	private Label pluginFileLabel;
-	
+
 	@FXML // fx:id="currentVersion"
-	private
-	RadioButton downloadPlugins;	
+	private RadioButton downloadPlugins;
 	@FXML // fx:id="currentVersion"
-	private
-	RadioButton useOsPlugins;
+	private RadioButton useOsPlugins;
 	@FXML // fx:id="currentVersion"
-	private
-	RadioButton selectPluginFile;
+	private RadioButton selectPluginFile;
 	@FXML // fx:id="yesButton"
 	private Button yesButton; // Value injected by FXMLLoader
 
@@ -98,6 +100,8 @@ public class CadoodleUpdater {
 	private Button noButton; // Value injected by FXMLLoader
 	@FXML // fx:id="noButton"
 	private Button uptodateButton;
+	@FXML // fx:id="noButton"
+	private Button selectPluginFileButton;
 	private static HashMap<String, Object> database;
 
 	private String bindir;
@@ -134,6 +138,7 @@ public class CadoodleUpdater {
 		infoBar.setText("Downloading CaDoodle Application, please wait...");
 		progressLabel.setText("Downloading 0.0%");
 		initialStartupControls.setVisible(false);
+		pluginFileBox.setVisible(false);
 		new Thread(() -> {
 
 			boolean downloadFailed = false;
@@ -203,7 +208,8 @@ public class CadoodleUpdater {
 	}
 
 	private boolean launched = false;
-	private Path goloblaPinFile=null;
+	private Path goloblaPinFile = null;
+	private Path pluginsZip;
 
 	public void launchApplication() {
 		if (launched) {
@@ -450,6 +456,7 @@ public class CadoodleUpdater {
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void onExtractLTS(ActionEvent ev) {
 		initialStartupControls.setVisible(false);
+		pluginFileBox.setVisible(false);
 		new Thread(() -> {
 			String pinFileName = bindir + "pinVersion";
 			File pinFile = new File(pinFileName);
@@ -465,6 +472,27 @@ public class CadoodleUpdater {
 		}).start();
 	}
 
+	@FXML // This method is called by the FXMLLoader when initialization is complete
+	void onselectFile(ActionEvent e) {
+
+		FileChooser fileChooser = new FileChooser();
+
+		fileChooser.setInitialDirectory(pluginsZip.getParent().toFile());
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip Files", "*.zip"));
+
+		fileChooser.setTitle("Plugin Archive Selection");
+
+		pluginsZip = fileChooser.showOpenDialog(stage).toPath();
+
+		pluginFileLabel.setText(pluginsZip.toAbsolutePath().toString());
+	}
+
+	@FXML // This method is called by the FXMLLoader when initialization is complete
+	void pluginOptionChange(ActionEvent e) {
+		selectPluginFileButton.setDisable(!selectPluginFile.isSelected());
+
+	}
+
 	private void setupDefaultVersion() {
 		bindir = System.getProperty("user.home") + "/bin/" + repoName + "Install/";
 		myVersionFileString = bindir + "currentversion.txt";
@@ -473,7 +501,11 @@ public class CadoodleUpdater {
 			System.out.println("Jar located in " + jarDir);
 			Path bundledZip = jarDir.resolve("CaDoodle-ApplicationInstall.zip");
 			goloblaPinFile = jarDir.resolve("pinVersionSystem");
-
+			pluginsZip = jarDir.resolve("BowlerStudioInstall.zip");
+			if (pluginsZip.toFile().exists()) {
+				selectPluginFile.setSelected(true);
+				pluginFileLabel.setText(pluginsZip.toAbsolutePath().toString());
+			}
 			Path jvmArchive = null;
 			String[] files = jarDir.toFile().list();
 			if (files != null) {
@@ -527,6 +559,7 @@ public class CadoodleUpdater {
 		assert progressBar != null : "fx:id=\"progressBar\" was not injected: check your FXML file 'ui.fxml'.";
 		assert previousVersion != null : "fx:id=\"previousVersion\" was not injected: check your FXML file 'ui.fxml'.";
 		assert currentVersion != null : "fx:id=\"currentVersion\" was not injected: check your FXML file 'ui.fxml'.";
+		assert pluginFileBox != null : "fx:id=\"currentVersion\" was not injected: check your FXML file 'ui.fxml'.";
 
 		stage.setTitle("Auto-Updater for " + repoName);
 		yesButton.setDisable(true);
@@ -561,19 +594,47 @@ public class CadoodleUpdater {
 		if (!myVersionFile.exists()) {
 			boolean MyNoInternet = noInternet;
 			initialStartupControls.setVisible(false);
-			
+			pluginFileBox.setVisible(false);
 			new Thread(() -> {
 				setupDefaultVersion();
-				boolean globalpin=false;
-				if(goloblaPinFile!=null) {
+				boolean globalpin = false;
+				if (goloblaPinFile != null) {
 					File gpinfile = goloblaPinFile.toFile();
-					if(gpinfile.exists()) {
-						globalpin=true;
+					if (gpinfile.exists()) {
+						globalpin = true;
 					}
 				}
-				boolean runDef  = MyNoInternet||globalpin;
+				boolean runDef = MyNoInternet || globalpin;
+				new Thread(()->{
+					Path homebin = Path.of(System.getProperty("user.home"), "bin");
+					Path pluginDir = homebin.resolve("BowlerStudioInstall");
+					
+					if(!pluginDir.toFile().exists() && pluginsZip.toFile().exists()) {
+						try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(pluginsZip))) {
+							Files.createDirectories(pluginDir);
+							ZipEntry entry;
+							while ((entry = zis.getNextEntry()) != null) {
+								Path target = pluginDir.resolve(entry.getName()).normalize();
+								if (!target.startsWith(pluginDir))
+									throw new SecurityException("Zip slip detected: " + entry.getName());
+								if (entry.isDirectory()) {
+									Files.createDirectories(target);
+								} else {
+									Files.createDirectories(target.getParent());
+									Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
+								}
+								zis.closeEntry();
+							}
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+				}).start();
 				Platform.runLater(() -> {
 					initialStartupControls.setVisible(true);
+					pluginFileBox.setVisible(true);
 					// uptodateButton.setDisable(noInternet);
 					yesButton.setVisible(false);
 					noButton.setVisible(false);
@@ -584,6 +645,7 @@ public class CadoodleUpdater {
 			return;
 		} else {
 			initialStartupControls.setVisible(false);
+			pluginFileBox.setVisible(false);
 			yesButton.setVisible(true);
 			noButton.setVisible(true);
 			try {
