@@ -11,8 +11,20 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.compress.utils.IOUtils;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -23,32 +35,32 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javafx.stage.Window;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.lang.reflect.Type;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JOptionPane;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.StandardOpenOption;
 
 public class CadoodleUpdater {
 	public static String[] argsFromSystem;
@@ -455,6 +467,7 @@ public class CadoodleUpdater {
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void onExtractLTS(ActionEvent ev) {
+		runPluginProcess();
 		initialStartupControls.setVisible(false);
 		pluginFileBox.setVisible(false);
 		new Thread(() -> {
@@ -470,6 +483,12 @@ public class CadoodleUpdater {
 			}
 			Platform.runLater(() -> onNo(null));
 		}).start();
+	}
+
+	@FXML // This method is called by the FXMLLoader when initialization is complete
+	void onFirstYes(ActionEvent ev) {
+		runPluginProcess();
+		onYes(ev);
 	}
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
@@ -505,6 +524,8 @@ public class CadoodleUpdater {
 			if (pluginsZip.toFile().exists()) {
 				selectPluginFile.setSelected(true);
 				pluginFileLabel.setText(pluginsZip.toAbsolutePath().toString());
+			} else {
+				selectPluginFileButton.setDisable(true);
 			}
 			Path jvmArchive = null;
 			String[] files = jarDir.toFile().list();
@@ -605,33 +626,7 @@ public class CadoodleUpdater {
 					}
 				}
 				boolean runDef = MyNoInternet || globalpin;
-				new Thread(()->{
-					Path homebin = Path.of(System.getProperty("user.home"), "bin");
-					Path pluginDir = homebin.resolve("BowlerStudioInstall");
-					
-					if(!pluginDir.toFile().exists() && pluginsZip.toFile().exists()) {
-						try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(pluginsZip))) {
-							Files.createDirectories(pluginDir);
-							ZipEntry entry;
-							while ((entry = zis.getNextEntry()) != null) {
-								Path target = pluginDir.resolve(entry.getName()).normalize();
-								if (!target.startsWith(pluginDir))
-									throw new SecurityException("Zip slip detected: " + entry.getName());
-								if (entry.isDirectory()) {
-									Files.createDirectories(target);
-								} else {
-									Files.createDirectories(target.getParent());
-									Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
-								}
-								zis.closeEntry();
-							}
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
 
-					}
-				}).start();
 				Platform.runLater(() -> {
 					initialStartupControls.setVisible(true);
 					pluginFileBox.setVisible(true);
@@ -679,5 +674,199 @@ public class CadoodleUpdater {
 			onNo(null);
 			return;
 		}
+	}
+
+	private void runPluginProcess() {
+		Stage progressStage = new Stage();
+		Path homebin = Path.of(System.getProperty("user.home"), "bin");
+		Path pluginDir = homebin.resolve("BowlerStudioInstall");
+		if (pluginDir.toFile().exists())
+			return;
+
+		new Thread(() -> {
+			if (downloadPlugins.isSelected()) {
+				ProgressBar progressBar = new ProgressBar(0);
+				progressBar.setPrefWidth(300);
+				Label label = new Label("Starting download...");
+				try {
+					pluginsZip = Files.createTempFile("BowlerStudioInstall", ".zip");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				String string = "https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download/3.1.8/BowlerStudioInstall-";
+				String string2 = "";
+				if (isMac()) {
+					string2 = "macos-arm";
+				}
+				if (isLin())
+					string2 = "linux";
+				if (isWin())
+					string2 = "windows";
+				URI uri = URI.create(string + string2 + ".zip");
+
+				Platform.runLater(() -> {
+					VBox root = new VBox(10, label, progressBar);
+					root.setPadding(new Insets(20));
+
+					// progressStage.initOwner(stage);
+					progressStage.initModality(Modality.WINDOW_MODAL);
+					progressStage.setTitle("Downloading Plugins...");
+					progressStage.setScene(new Scene(root));
+					progressStage.setResizable(false);
+					progressStage.show();
+				});
+
+				HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
+
+				HttpRequest request = HttpRequest.newBuilder().uri(uri).build();
+
+				try {
+					HttpResponse<InputStream> response = client.send(request,
+							HttpResponse.BodyHandlers.ofInputStream());
+
+					long contentLength = response.headers().firstValueAsLong("Content-Length").orElse(-1);
+
+					try (InputStream in = response.body();
+							OutputStream out = Files.newOutputStream(pluginsZip, StandardOpenOption.WRITE)) {
+
+						byte[] buffer = new byte[8192];
+						long totalRead = 0;
+						int read;
+
+						while ((read = in.read(buffer)) != -1) {
+							out.write(buffer, 0, read);
+							totalRead += read;
+
+							long finalTotalRead = totalRead;
+							Platform.runLater(() -> {
+								if (contentLength > 0) {
+									double fraction = (double) finalTotalRead / contentLength;
+									progressBar.setProgress(fraction);
+									label.setText(String.format("%,d / %,d KB (%.0f%%)", finalTotalRead / 1024,
+											contentLength / 1024, fraction * 100));
+								} else {
+									progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+									label.setText(String.format("%,d KB downloaded", finalTotalRead / 1024));
+								}
+							});
+						}
+					}
+				} catch (IOException | InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} finally {
+					Platform.runLater(progressStage::close);
+				}
+				pluginsZip.toFile().deleteOnExit();
+			}
+			if (pluginsZip.toFile().exists()) {
+				try {
+					Files.createDirectories(pluginDir);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					unzip(pluginsZip.toFile(),pluginDir.toString());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}).start();
+	}
+
+	public static void unzip(File path, String dir) throws Exception {
+		Path destFolderPath = new File(dir).toPath();
+
+		try (ZipFile zipFile = ZipFile.builder().setFile(path).get()) {
+			Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
+			while (entries.hasMoreElements()) {
+				ZipArchiveEntry entry = entries.nextElement();
+				Path entryPath = destFolderPath.resolve(entry.getName());
+				if (entryPath.normalize().startsWith(destFolderPath.normalize())) {
+					if (entry.isDirectory()) {
+						Files.createDirectories(entryPath);
+					} else {
+						Files.createDirectories(entryPath.getParent());
+
+						// Check timestamps before extracting
+						File file = entryPath.toFile();
+						file.getParentFile().mkdirs();
+						File targetFile = file;
+						boolean shouldExtract = false;
+
+						if (!targetFile.exists()) {
+							// File doesn't exist, extract it
+							shouldExtract = true;
+						} else {
+							// File exists, compare timestamps
+							long zipTime = entry.getTime();
+							long diskTime = targetFile.lastModified();
+
+							if (zipTime > diskTime) {
+								// Zip file is newer, extract it
+								shouldExtract = true;
+								// Log.debug("Updating file (zip is newer): " + entryPath);
+							} else {
+								// Disk file is newer or same, skip extraction
+								// Log.debug("Skipping file (disk is newer or same): " + entryPath);
+							}
+						}
+
+						if (shouldExtract) {
+							try (InputStream in = zipFile.getInputStream(entry)) {
+								try {
+									// ar.setExternalAttributes(entry.extraAttributes);
+									if (entry.isUnixSymlink()) {
+										String text = new BufferedReader(
+												new InputStreamReader(in, StandardCharsets.UTF_8)).lines()
+												.collect(Collectors.joining("\n"));
+										Path target = Paths.get(".", text);
+										Files.createSymbolicLink(entryPath, target);
+										continue;
+									}
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+								try (OutputStream out = new FileOutputStream(file)) {
+									IOUtils.copy(in, out);
+									// com.neuronrobotics.sdk.common.Log.debug("Inflating " + entryPath);
+								} catch (Exception ex) {
+									// Log.error(ex);
+								}
+								if (isExecutable(entry)) {
+									file.setExecutable(true);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public static boolean isExecutable(ZipArchiveEntry entry) {
+		int unixMode = entry.getUnixMode();
+		// Check if any of the executable bits are set for user, group, or others.
+		// User executable: 0100 (0x40), Group executable: 0010 (0x10), Others
+		// executable: 0001 (0x01)
+		return (unixMode & 0x49) != 0;
+	}
+
+	private static boolean isPosixCompliantSystem() {
+		return FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+	}
+
+	private static Set<PosixFilePermission> getPosixPermissions(int mode) {
+		StringBuilder permissions = new StringBuilder("rwxrwxrwx");
+		for (int i = 0; i < 9; i++) {
+			if ((mode & (1 << (8 - i))) == 0) {
+				permissions.setCharAt(i, '-');
+			}
+		}
+		return java.nio.file.attribute.PosixFilePermissions.fromString(permissions.toString());
 	}
 }

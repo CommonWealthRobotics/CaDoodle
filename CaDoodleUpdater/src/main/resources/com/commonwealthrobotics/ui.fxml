@@ -138,7 +138,7 @@
                           </rowConstraints>
                            <children>
                               <Label text="First Time Launch" />
-                              <Button fx:id="uptodateButton" mnemonicParsing="false" onAction="#onYes" text="Keep Up To Date" GridPane.columnIndex="1">
+                              <Button fx:id="uptodateButton" mnemonicParsing="false" onAction="#onFirstYes" text="Keep Up To Date" GridPane.columnIndex="1">
                                  <styleClass>
                                     <String fx:value="image-button" />
                                     <String fx:value="image-button-focus" />
@@ -156,8 +156,8 @@
                                     <ToggleGroup fx:id="plugins" />
                                  </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="useOsPlugins" mnemonicParsing="false" onAction="#pluginOptionChange" text="Use OS Only" toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <RadioButton fx:id="selectPluginFile" mnemonicParsing="false" onAction="#pluginOptionChange" text="Select File..." toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                              <RadioButton fx:id="useOsPlugins" mnemonicParsing="false" onAction="#pluginOptionChange" text="Use OS Only (No Internet)" toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                              <RadioButton fx:id="selectPluginFile" mnemonicParsing="false" onAction="#pluginOptionChange" text="Select File... (No Internet)" toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
                      </children>
@@ -165,7 +165,7 @@
                         <Insets left="20.0" top="20.0" />
                      </padding>
                   </HBox>
-                  <HBox fx:id="pluginFileBox" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                  <HBox fx:id="pluginFileBox" spacing="10.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                      <children>
                         <Button fx:id="selectPluginFileButton" minWidth="84.0" mnemonicParsing="false" onAction="#onselectFile" prefHeight="26.0" prefWidth="84.0" text="Select..." />
                         <Label fx:id="pluginFileLabel" />
