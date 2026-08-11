@@ -96,56 +96,133 @@ rm -R $NAME.iconset
 #        NOTARY_TEAM_ID    your 10-char Team ID
 #        NOTARY_PASSWORD   an app-specific password (appleid.apple.com)
 # ---------------------------------------------------------------------------
+```bash
+# ---------------------------------------------------------------------------
+# Code signing + notarization
+# ---------------------------------------------------------------------------
+
 SIGN_ARGS=()
 DO_SIGN=false
+
 if [[ -n "${MACOS_SIGN_IDENTITY}" ]]; then
   DO_SIGN=true
   echo "Signing as: Developer ID Application: ${MACOS_SIGN_IDENTITY}"
+
   SIGN_ARGS+=( --mac-sign
                --mac-signing-key-user-name "${MACOS_SIGN_IDENTITY}"
                --mac-package-identifier "com.commonwealthrobotics.cadoodle"
                --mac-entitlements "$SCRIPT_DIR/mac-entitlements.plist" )
-  [[ -n "${MACOS_KEYCHAIN}" ]] && SIGN_ARGS+=( --mac-signing-keychain "${MACOS_KEYCHAIN}" )
+
+  [[ -n "${MACOS_KEYCHAIN}" ]] && \
+    SIGN_ARGS+=( --mac-signing-keychain "${MACOS_KEYCHAIN}" )
 else
   echo "MACOS_SIGN_IDENTITY not set -> building UNSIGNED (notarization skipped)."
 fi
 
-$JAVA_HOME/bin/jpackage --input $BUILDDIR \
-  --name $NAME \
-  --main-jar $TARGETJAR \
-  --main-class $MAIN \
+$JAVA_HOME/bin/jpackage --input "$BUILDDIR" \
+  --name "$NAME" \
+  --main-jar "$TARGETJAR" \
+  --main-class "$MAIN" \
   --type dmg \
   --copyright "Creative Commons" \
   --vendor "Common Wealth Robotics" \
-  --icon $NAME.icns \
+  --icon "$NAME.icns" \
   --app-version "$VERSION" \
   "${SIGN_ARGS[@]}" \
   --java-options '--enable-preview -Dcom.sun.net.ssl.checkRevocation=false -Djava.security.revocation=false'
+
 ls -al
+
 rm -rf release
 mkdir release
+
 DMG="release/$NAME-MacOS-$ARCH.dmg"
-mv $NAME-$VERSION.dmg "$DMG"
+mv "$NAME-$VERSION.dmg" "$DMG"
 
 # ---- Notarize + staple (only when the build was signed) ----
 if [[ "$DO_SIGN" == "true" ]]; then
+
   NOTARY_ARGS=()
-  if [[ -n "${NOTARY_KEY_PATH}" && -n "${NOTARY_KEY_ID}" && -n "${NOTARY_ISSUER_ID}" ]]; then
+
+  if [[ -n "${NOTARY_KEY_PATH}" &&
+        -n "${NOTARY_KEY_ID}" &&
+        -n "${NOTARY_ISSUER_ID}" ]]; then
+
     echo "Notarizing with App Store Connect API key..."
-    NOTARY_ARGS=( --key "${NOTARY_KEY_PATH}" --key-id "${NOTARY_KEY_ID}" --issuer "${NOTARY_ISSUER_ID}" )
-  elif [[ -n "${NOTARY_APPLE_ID}" && -n "${NOTARY_TEAM_ID}" && -n "${NOTARY_PASSWORD}" ]]; then
+
+    NOTARY_ARGS=(
+      --key "$NOTARY_KEY_PATH"
+      --key-id "$NOTARY_KEY_ID"
+      --issuer "$NOTARY_ISSUER_ID"
+    )
+
+  elif [[ -n "${NOTARY_APPLE_ID}" &&
+          -n "${NOTARY_TEAM_ID}" &&
+          -n "${NOTARY_PASSWORD}" ]]; then
+
     echo "Notarizing with Apple ID + app-specific password..."
-    NOTARY_ARGS=( --apple-id "${NOTARY_APPLE_ID}" --team-id "${NOTARY_TEAM_ID}" --password "${NOTARY_PASSWORD}" )
+
+    NOTARY_ARGS=(
+      --apple-id "$NOTARY_APPLE_ID"
+      --team-id "$NOTARY_TEAM_ID"
+      --password "$NOTARY_PASSWORD"
+    )
   fi
 
   if [[ ${#NOTARY_ARGS[@]} -gt 0 ]]; then
-    xcrun notarytool submit "$DMG" "${NOTARY_ARGS[@]}" --wait
+
+    echo "Submitting $DMG to Apple notarization service..."
+
+    # Capture the submission output so we can retrieve the log if Apple
+    # rejects the submission.
+    NOTARY_OUTPUT=$(
+      xcrun notarytool submit "$DMG" \
+        "${NOTARY_ARGS[@]}" \
+        --wait \
+        --output-format json
+    )
+
+    echo "$NOTARY_OUTPUT"
+
+    NOTARY_ID=$(echo "$NOTARY_OUTPUT" | \
+      /usr/bin/python3 -c \
+      'import sys,json; print(json.load(sys.stdin)["id"])')
+
+    NOTARY_STATUS=$(echo "$NOTARY_OUTPUT" | \
+      /usr/bin/python3 -c \
+      'import sys,json; print(json.load(sys.stdin)["status"])')
+
+    echo "Notarization status: $NOTARY_STATUS"
+    echo "Notarization ID: $NOTARY_ID"
+
+    if [[ "$NOTARY_STATUS" != "Accepted" ]]; then
+      echo "ERROR: Apple rejected the notarization."
+      echo "Retrieving Apple's notarization log..."
+
+      xcrun notarytool log "$NOTARY_ID" \
+        "${NOTARY_ARGS[@]}"
+
+      echo "Notarization failed; refusing to staple an invalid ticket."
+      exit 1
+    fi
+
+    echo "Apple accepted the notarization."
+
     echo "Stapling notarization ticket to $DMG ..."
     xcrun stapler staple "$DMG"
+
+    echo "Validating stapled DMG ..."
     xcrun stapler validate "$DMG"
-    spctl -a -t open --context context:primary-signature -v "$DMG" || true
+
+    echo "Validating Developer ID signature ..."
+    spctl -a \
+      -t open \
+      --context context:primary-signature \
+      -v "$DMG"
+
   else
     echo "Signed, but no notarization credentials set -> skipping notarization."
-    echo "WARNING: the DMG is signed but NOT notarized; macOS 26 will still warn on download."
+    echo "WARNING: The DMG is signed but NOT notarized."
   fi
 fi
+```
