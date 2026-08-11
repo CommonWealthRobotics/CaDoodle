@@ -26,11 +26,11 @@ export JAVA_HOME=$HOME/bin/java17/
 if test -d $JAVA_HOME/$JVM/; then
   echo "$JAVA_HOME exists."
 else
-	rm -rf $JAVA_HOME
-	mkdir -p $JAVA_HOME
-	curl https://cdn.azul.com/zulu/bin/$ZIP -o $ZIP
-	tar -xvzf $ZIP -C $JAVA_HOME
-	mv $JAVA_HOME/$JVM/* $JAVA_HOME/
+    rm -rf $JAVA_HOME
+    mkdir -p $JAVA_HOME
+    curl https://cdn.azul.com/zulu/bin/$ZIP -o $ZIP
+    tar -xvzf $ZIP -C $JAVA_HOME
+    mv $JAVA_HOME/$JVM/* $JAVA_HOME/
 fi
 
 ./gradlew shadowJar
@@ -139,7 +139,22 @@ if [[ "$DO_SIGN" == "true" ]]; then
   fi
 
   if [[ ${#NOTARY_ARGS[@]} -gt 0 ]]; then
-    xcrun notarytool submit "$DMG" "${NOTARY_ARGS[@]}" --wait
+    # Use JSON output so we can reliably read the submission id and final
+    # status, instead of scraping the human-readable progress text.
+    NOTARY_JSON=$(xcrun notarytool submit "$DMG" "${NOTARY_ARGS[@]}" --wait --output-format json)
+    echo "$NOTARY_JSON"
+
+    SUBMISSION_ID=$(echo "$NOTARY_JSON" | python3 -c "import json,sys; print(json.load(sys.stdin)['id'])")
+    NOTARY_STATUS=$(echo "$NOTARY_JSON" | python3 -c "import json,sys; print(json.load(sys.stdin)['status'])")
+
+    if [[ "$NOTARY_STATUS" != "Accepted" ]]; then
+      echo "Notarization finished with status: $NOTARY_STATUS"
+      echo "Fetching notarization log for submission $SUBMISSION_ID ..."
+      xcrun notarytool log "$SUBMISSION_ID" "${NOTARY_ARGS[@]}" || true
+      echo "See the issues above for why Apple rejected the DMG (unsigned nested binaries, missing hardened runtime, invalid entitlements, etc.)."
+      exit 1
+    fi
+
     echo "Stapling notarization ticket to $DMG ..."
     xcrun stapler staple "$DMG"
     xcrun stapler validate "$DMG"
