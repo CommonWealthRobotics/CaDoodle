@@ -708,9 +708,10 @@ public class CadoodleUpdater {
 				Platform.runLater(() -> {
 					VBox root = new VBox(10, label, progressBar);
 					root.setPadding(new Insets(20));
-
+					String css = getClass().getResource("/com/commonwealthrobotics/stylesheet.css").toExternalForm();
+					root.getStylesheets().add(css);
 					// progressStage.initOwner(stage);
-					progressStage.initModality(Modality.WINDOW_MODAL);
+					progressStage.initModality(Modality.APPLICATION_MODAL);
 					progressStage.setTitle("Downloading Plugins...");
 					progressStage.setScene(new Scene(root));
 					progressStage.setResizable(false);
@@ -730,11 +731,11 @@ public class CadoodleUpdater {
 					try (InputStream in = response.body();
 							OutputStream out = Files.newOutputStream(pluginsZip, StandardOpenOption.WRITE)) {
 
-						byte[] buffer = new byte[8192];
+						byte[] buffer = new byte[81920];
 						long totalRead = 0;
 						int read;
 
-						while ((read = in.read(buffer)) != -1) {
+						while ((read = in.read(buffer)) != -1 && progressStage.isShowing()) {
 							out.write(buffer, 0, read);
 							totalRead += read;
 
@@ -743,8 +744,8 @@ public class CadoodleUpdater {
 								if (contentLength > 0) {
 									double fraction = (double) finalTotalRead / contentLength;
 									progressBar.setProgress(fraction);
-									label.setText(String.format("%,d / %,d KB (%.0f%%)", finalTotalRead / 1024,
-											contentLength / 1024, fraction * 100));
+									label.setText(String.format("%.3f / %.3f GB (%.2f%%)", ((double) finalTotalRead) /1024.0/ 1024.0/1024.0,
+											((double)contentLength) / 1024.0/1024.0/1024.0, fraction * 100));
 								} else {
 									progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
 									label.setText(String.format("%,d KB downloaded", finalTotalRead / 1024));
