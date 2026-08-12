@@ -75,42 +75,10 @@ brew install --cask inkscape blender freecad meshlab openscad@snapshot
 ### Ubuntu Plugins
 
 ```
-sudo apt update
-
-sudo apt install -y \
-    wget \
-    freecad \
-    inkscape \
-    blender \
-    meshlab
-
-wget -qO- https://files.openscad.org/OBS-Repository-Key.pub | \
-    sudo tee /etc/apt/trusted.gpg.d/obs-openscad-nightly.asc > /dev/null
-
-echo "deb https://download.opensuse.org/repositories/home:/t-paul/xUbuntu_26.04/ ./" | \
-    sudo tee /etc/apt/sources.list.d/openscad.list
-
-sudo apt update
-sudo apt install -y openscad-nightly
+sudo add-apt-repository ppa:freecad-maintainers/freecad-stable
+sudo apt install -y wget  freecad inkscape meshlab
+sudo snap install blender --classic
 ```
-
-### Flatpack Plugins
-
-```
-sudo apt update
-sudo apt install -y flatpak
-
-sudo flatpak remote-add --if-not-exists flathub \
-    https://flathub.org/repo/flathub.flatpakrepo
-
-flatpak install -y flathub \
-    org.freecad.FreeCAD \
-    org.openscad.OpenSCAD \
-    org.inkscape.Inkscape \
-    org.blender.Blender
-    
-```
-
 
 # Visual Studio Code building the Java JAR file
 
