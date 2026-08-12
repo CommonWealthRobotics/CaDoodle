@@ -735,23 +735,53 @@ public class CadoodleUpdater {
 						long totalRead = 0;
 						int read;
 
+						long lastUpdateTime = System.nanoTime();
+						long lastUpdateBytes = 0;
+						final long UPDATE_INTERVAL_NS = 100_000_000L; // update UI ~10x/sec
+
 						while ((read = in.read(buffer)) != -1 && progressStage.isShowing()) {
 							out.write(buffer, 0, read);
 							totalRead += read;
 
-							long finalTotalRead = totalRead;
-							Platform.runLater(() -> {
-								if (contentLength > 0) {
-									double fraction = (double) finalTotalRead / contentLength;
-									progressBar.setProgress(fraction);
-									label.setText(String.format("%.3f / %.3f GB (%.2f%%)", ((double) finalTotalRead) /1024.0/ 1024.0/1024.0,
-											((double)contentLength) / 1024.0/1024.0/1024.0, fraction * 100));
-								} else {
-									progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
-									label.setText(String.format("%,d KB downloaded", finalTotalRead / 1024));
-								}
-							});
+							long now = System.nanoTime();
+							if (now - lastUpdateTime >= UPDATE_INTERVAL_NS) {
+								long finalTotalRead = totalRead;
+								double elapsedSec = (now - lastUpdateTime) / 1_000_000_000.0;
+								double intervalBytes = finalTotalRead - lastUpdateBytes;
+								// bits per second / 1_000_000 = Mbps
+								double speedMbps = elapsedSec > 0 ? (intervalBytes * 8.0 / 1_000_000.0) / elapsedSec
+										: 0.0;
+
+								lastUpdateTime = now;
+								lastUpdateBytes = finalTotalRead;
+
+								Platform.runLater(() -> {
+									if (contentLength > 0) {
+										double fraction = (double) finalTotalRead / contentLength;
+										progressBar.setProgress(fraction);
+										label.setText(String.format("%.3f / %.3f GB (%.1f%%) — %.2f Mbps",
+												finalTotalRead / 1024.0 / 1024.0 / 1024.0,
+												contentLength / 1024.0 / 1024.0 / 1024.0, fraction * 100, speedMbps));
+									} else {
+										progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+										label.setText(String.format("%,d KB downloaded — %.2f Mbps",
+												finalTotalRead / 1024, speedMbps));
+									}
+								});
+							}
 						}
+
+						// final update after loop ends, so the label doesn't stall short of 100%
+						long finalTotalRead = totalRead;
+						Platform.runLater(() -> {
+							if (contentLength > 0) {
+								double fraction = (double) finalTotalRead / contentLength;
+								progressBar.setProgress(fraction);
+								label.setText(String.format("%.3f / %.3f GB (100.0%%)",
+										finalTotalRead / 1024.0 / 1024.0 / 1024.0,
+										contentLength / 1024.0 / 1024.0 / 1024.0));
+							}
+						});
 					}
 				} catch (IOException | InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -769,7 +799,7 @@ public class CadoodleUpdater {
 					e.printStackTrace();
 				}
 				try {
-					unzip(pluginsZip.toFile(),pluginDir.toString());
+					unzip(pluginsZip.toFile(), pluginDir.toString());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
