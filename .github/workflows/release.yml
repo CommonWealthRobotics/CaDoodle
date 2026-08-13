@@ -447,5 +447,7 @@ jobs:
             CaDoodle-Windows-x86_64.zip
             CaDoodle-MacOS-x86_64.dmg
             CaDoodle-MacOS-arm64.dmg
+            CaDoodle-Linux-arm64-bookworm.AppImage
+            CaDoodle-Linux-arm64-bookworm.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
