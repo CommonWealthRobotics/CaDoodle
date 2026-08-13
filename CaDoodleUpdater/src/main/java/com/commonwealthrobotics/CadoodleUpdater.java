@@ -611,8 +611,12 @@ public class CadoodleUpdater {
 		bindirFile = new File(bindir);
 		if (!bindirFile.exists())
 			bindirFile.mkdirs();
+		Path homebin = Path.of(System.getProperty("user.home"), "bin");
+		Path pluginDir = homebin.resolve("BowlerStudioInstall");
 
-		if (!myVersionFile.exists()) {
+		if (!myVersionFile.exists()||!pluginDir.toFile().exists()) {
+			if(!pluginDir.toFile().exists())
+				pluginDir.toFile().mkdirs();
 			boolean MyNoInternet = noInternet;
 			initialStartupControls.setVisible(false);
 			pluginFileBox.setVisible(false);
@@ -680,8 +684,8 @@ public class CadoodleUpdater {
 		Stage progressStage = new Stage();
 		Path homebin = Path.of(System.getProperty("user.home"), "bin");
 		Path pluginDir = homebin.resolve("BowlerStudioInstall");
-		if (pluginDir.toFile().exists())
-			return;
+//		if (pluginDir.toFile().exists())
+//			return;
 
 		new Thread(() -> {
 			if (downloadPlugins.isSelected()) {
@@ -694,8 +698,8 @@ public class CadoodleUpdater {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				String version = "3.1.22";
-				String string = "https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download/" + version
+				String pluginsVersion = "3.1.22";
+				String string = "https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download/" + pluginsVersion
 						+ "/BowlerStudioInstall-";
 				String string2 = "";
 				if (isMac()) {
@@ -813,7 +817,7 @@ public class CadoodleUpdater {
 
 	public static void unzip(File path, String dir) throws Exception {
 		Path destFolderPath = new File(dir).toPath();
-
+		System.out.println("Unzipping "+path);
 		try (ZipFile zipFile = ZipFile.builder().setFile(path).get()) {
 			Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
 			while (entries.hasMoreElements()) {
@@ -879,6 +883,8 @@ public class CadoodleUpdater {
 				}
 			}
 		}
+		System.out.println("Done Unzipping to "+dir);
+
 	}
 
 	public static boolean isExecutable(ZipArchiveEntry entry) {
