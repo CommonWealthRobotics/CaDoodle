@@ -694,7 +694,9 @@ public class CadoodleUpdater {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				String string = "https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download/3.1.8/BowlerStudioInstall-";
+				String version = "3.1.22";
+				String string = "https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download/" + version
+						+ "/BowlerStudioInstall-";
 				String string2 = "";
 				if (isMac()) {
 					string2 = "macos-arm";
