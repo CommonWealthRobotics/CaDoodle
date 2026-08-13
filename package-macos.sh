@@ -41,7 +41,7 @@ JAR_NAME=CaDoodleUpdater.jar
 #$JAVA_HOME/bin/java -jar $DIR/$JAR_NAME
 echo "Test jar complete"
 
-cp zulu*jre*-macosx_*.zip $DIR/
+cp zulu*jdk*-macosx_*.zip $DIR/
 cp CaDoodle-ApplicationInstall.zip $DIR/
 #if [[ $(uname -m) == 'arm64' ]]; then
 #    cp BowlerStudioInstall.zip $DIR/

@@ -531,7 +531,7 @@ public class CadoodleUpdater {
 			String[] files = jarDir.toFile().list();
 			if (files != null) {
 				for (String s : files) {
-					if (s.startsWith("zulu") && s.contains("jre")) {
+					if (s.startsWith("zulu") && (s.contains("jdk") || s.contains("jre"))) {
 						jvmArchive = jarDir.resolve(s);
 						break;
 					}
