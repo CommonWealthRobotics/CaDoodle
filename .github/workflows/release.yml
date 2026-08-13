@@ -4,8 +4,8 @@ on:
 
 env:
   JVM_JSON_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/latest/download/jvm.json
-  APP_INSTALL_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/download/0.46.048/CaDoodle-ApplicationInstall.zip
-  BOWLER_KERNEL_VERSION: 3.1.9
+  APP_INSTALL_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/download/0.46.050/CaDoodle-ApplicationInstall.zip
+  BOWLER_KERNEL_VERSION: 3.1.22
   BOWLER_STUDIO_INSTALL_BASE_URL: https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download
 
 jobs:
@@ -129,10 +129,6 @@ jobs:
           curl -L "${{ env.JVM_JSON_URL }}" -o jvm.json
           curl -L "${{ env.APP_INSTALL_URL }}" -o CaDoodle-ApplicationInstall.zip
 
-      - name: Download BowlerStudioInstall (Linux x64)
-        run: |
-          curl -L "${{ env.BOWLER_STUDIO_INSTALL_BASE_URL }}/${{ env.BOWLER_KERNEL_VERSION }}/BowlerStudioInstall-linux.zip" -o BowlerStudioInstall.zip
-
       - name: Download JVM (Linux-x64)
         run: |
           JVM_NAME=$(jq -r '.["Linux-x64"].name' jvm.json)
@@ -179,11 +175,6 @@ jobs:
         run: |
           curl -L "${{ env.JVM_JSON_URL }}" -o jvm.json
           curl -L "${{ env.APP_INSTALL_URL }}" -o CaDoodle-ApplicationInstall.zip
-
-      - name: Download BowlerStudioInstall (Windows x64)
-        shell: bash
-        run: |
-          curl -L "${{ env.BOWLER_STUDIO_INSTALL_BASE_URL }}/${{ env.BOWLER_KERNEL_VERSION }}/BowlerStudioInstall-windows.zip" -o BowlerStudioInstall.zip
 
       - name: Download JVM (Windows-x64)
         shell: bash
@@ -234,10 +225,6 @@ jobs:
         run: |
           curl -L "${{ env.JVM_JSON_URL }}" -o jvm.json
           curl -L "${{ env.APP_INSTALL_URL }}" -o CaDoodle-ApplicationInstall.zip
-
-      - name: Download BowlerStudioInstall (macOS arm64)
-        run: |
-          curl -L "${{ env.BOWLER_STUDIO_INSTALL_BASE_URL }}/${{ env.BOWLER_KERNEL_VERSION }}/BowlerStudioInstall-macos-arm.zip" -o BowlerStudioInstall.zip
 
       - name: Download JVM (Mac-aarch64)
         run: |
@@ -350,10 +337,6 @@ jobs:
           curl -L "${{ env.JVM_JSON_URL }}" -o jvm.json
           curl -L "${{ env.APP_INSTALL_URL }}" -o CaDoodle-ApplicationInstall.zip
 
-      - name: Download BowlerStudioInstall (macOS x64)
-        run: |
-          curl -L "${{ env.BOWLER_STUDIO_INSTALL_BASE_URL }}/${{ env.BOWLER_KERNEL_VERSION }}/BowlerStudioInstall-macos-arm.zip" -o BowlerStudioInstall.zip
-
       - name: Download JVM (Mac-x64)
         run: |
           JVM_NAME=$(jq -r '.["Mac-x64"].name' jvm.json)
@@ -403,6 +386,12 @@ jobs:
         run: |
           echo $VERSION_SEMVER
           echo ${{ steps.vars.outputs.tag }}
+
+      - name: Download plugin bundles
+        run: |
+          curl -L "${{ env.BOWLER_STUDIO_INSTALL_BASE_URL }}/${{ env.BOWLER_KERNEL_VERSION }}/BowlerStudioInstall-linux.zip" -o BowlerStudioInstall-linux.zip
+          curl -L "${{ env.BOWLER_STUDIO_INSTALL_BASE_URL }}/${{ env.BOWLER_KERNEL_VERSION }}/BowlerStudioInstall-windows.zip" -o BowlerStudioInstall-windows.zip
+          curl -L "${{ env.BOWLER_STUDIO_INSTALL_BASE_URL }}/${{ env.BOWLER_KERNEL_VERSION }}/BowlerStudioInstall-macos-arm.zip" -o BowlerStudioInstall-macos-arm.zip
 
       - name: Download result for job Bookworm
         uses: actions/download-artifact@v4
@@ -468,5 +457,8 @@ jobs:
             CaDoodle-MacOS-arm64.dmg
             CaDoodle-Linux-arm64-bookworm.AppImage
             CaDoodle-Linux-arm64-bookworm.deb
+            BowlerStudioInstall-linux.zip
+            BowlerStudioInstall-windows.zip
+            BowlerStudioInstall-macos-arm.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
