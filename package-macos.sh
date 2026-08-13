@@ -14,8 +14,8 @@ ARCH=x86_64
 JVM=zulu25.36.15-ca-fx-jdk25.0.4-macosx_x64
 if [[ $(uname -m) == 'arm64' ]]; then
   ARCH=arm64
-  echo "Apple Silicon Mac detected https://cdn.azul.com/zulu/bin/zulu25.36.15-ca-fx-jdk25.0.4-macosx_aarch64.tar.gz"
-  JVM=zulu25.36.15-ca-fx-jdk25.0.4-macosx_aarch64
+  echo "Apple Silicon Mac detected https://cdn.azul.com/zulu/bin/zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64.tar.gz"
+  JVM=zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64
 else
   echo "Intel Mac detected https://cdn.azul.com/zulu/bin/zulu25.36.15-ca-fx-jdk25.0.4-macosx_x64.tar.gz"
 
