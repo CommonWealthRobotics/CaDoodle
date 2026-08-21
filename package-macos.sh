@@ -44,7 +44,8 @@ echo "Test jar complete"
 cp zulu*jdk*-macosx_*.zip $DIR/
 cp CaDoodle-ApplicationInstall.zip $DIR/
 if [[ $(uname -m) == 'arm64' ]]; then
-    unzip -o BowlerStudioInstall-macos-arm.zip -d $DIR/
+    mkdir $DIR/BowlerStudioInstall/
+    unzip -o BowlerStudioInstall-macos-arm.zip -d $DIR/BowlerStudioInstall/
 fi
 echo "\n\nTarget Dir: $DIR"
 ls -al $DIR/
