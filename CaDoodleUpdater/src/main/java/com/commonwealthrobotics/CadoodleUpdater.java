@@ -222,6 +222,7 @@ public class CadoodleUpdater {
 	private boolean launched = false;
 	private Path goloblaPinFile = null;
 	private Path pluginsZip;
+	private Path pluginExtracted;
 
 	public void launchApplication() {
 		if (launched) {
@@ -239,6 +240,21 @@ public class CadoodleUpdater {
 
 		new Thread(() -> {
 			String command;
+			Path jarDir;
+			try {
+				jarDir = Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+				pluginExtracted = jarDir.resolve("BowlerStudioInstall");
+				if (pluginExtracted != null) {
+					File pluginExtractedFile = pluginExtracted.toFile();
+					if (pluginExtractedFile.exists() && pluginExtractedFile.isDirectory()) {
+						useOsPlugins.setSelected(true);
+					}
+				}
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			try {
 				command = JvmManager.getCommandString(project, repoName, myVersionString, downloadJsonURL, downloadZip,
 						sizeOfZip, sizeOfJson, progressBar, progressLabel, bindir, infoBar);
@@ -297,7 +313,12 @@ public class CadoodleUpdater {
 					String javaHome = extractJavaHomeFromCommand(command);
 					if (javaHome != null)
 						env.put("JAVA_HOME", javaHome);
-
+					if (pluginExtracted != null) {
+						File pluginExtractedFile = pluginExtracted.toFile();
+						if (pluginExtractedFile.exists() && pluginExtractedFile.isDirectory()) {
+							env.put("BOWLER_PLUGIN_LOCATION", pluginExtractedFile.getAbsolutePath());
+						}
+					}
 					// Convert environment map to array format
 					String[] envArray = env.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue())
 							.toArray(String[]::new);
@@ -521,6 +542,7 @@ public class CadoodleUpdater {
 			Path bundledZip = jarDir.resolve("CaDoodle-ApplicationInstall.zip");
 			goloblaPinFile = jarDir.resolve("pinVersionSystem");
 			pluginsZip = jarDir.resolve("BowlerStudioInstall.zip");
+
 			if (pluginsZip.toFile().exists()) {
 				selectPluginFile.setSelected(true);
 				pluginFileLabel.setText(pluginsZip.toAbsolutePath().toString());
@@ -614,8 +636,8 @@ public class CadoodleUpdater {
 		Path homebin = Path.of(System.getProperty("user.home"), "bin");
 		Path pluginDir = homebin.resolve("BowlerStudioInstall");
 
-		if (!myVersionFile.exists()||!pluginDir.toFile().exists()) {
-			if(!pluginDir.toFile().exists())
+		if (!myVersionFile.exists() || !pluginDir.toFile().exists()) {
+			if (!pluginDir.toFile().exists())
 				pluginDir.toFile().mkdirs();
 			boolean MyNoInternet = noInternet;
 			initialStartupControls.setVisible(false);
@@ -699,8 +721,8 @@ public class CadoodleUpdater {
 					e.printStackTrace();
 				}
 				String pluginsVersion = "3.1.22";
-				String string = "https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download/" + pluginsVersion
-						+ "/BowlerStudioInstall-";
+				String string = "https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download/"
+						+ pluginsVersion + "/BowlerStudioInstall-";
 				String string2 = "";
 				if (isMac()) {
 					string2 = "macos-arm";
@@ -817,7 +839,7 @@ public class CadoodleUpdater {
 
 	public static void unzip(File path, String dir) throws Exception {
 		Path destFolderPath = new File(dir).toPath();
-		System.out.println("Unzipping "+path);
+		System.out.println("Unzipping " + path);
 		try (ZipFile zipFile = ZipFile.builder().setFile(path).get()) {
 			Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
 			while (entries.hasMoreElements()) {
@@ -883,7 +905,7 @@ public class CadoodleUpdater {
 				}
 			}
 		}
-		System.out.println("Done Unzipping to "+dir);
+		System.out.println("Done Unzipping to " + dir);
 
 	}
 
