@@ -5,6 +5,8 @@ on:
 env:
   JVM_JSON_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/latest/download/jvm.json
   APP_INSTALL_URL: https://github.com/CommonWealthRobotics/CaDoodle-Application/releases/download/0.46.053/CaDoodle-ApplicationInstall.zip
+  BOWLER_KERNEL_VERSION: 3.1.22
+  BOWLER_STUDIO_INSTALL_BASE_URL: https://github.com/CommonWealthRobotics/bowler-script-kernel/releases/download
 
 jobs:
   debian-bookworm:
@@ -276,7 +278,9 @@ jobs:
           NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
           NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
           NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
-        run: bash package-macos.sh
+        run: |
+           curl -L "${{ env.BOWLER_STUDIO_INSTALL_BASE_URL }}/${{ env.BOWLER_KERNEL_VERSION }}/BowlerStudioInstall-macos-arm.zip" -o BowlerStudioInstall-macos-arm.zip
+           bash package-macos.sh
 
       - name: Upload result for job Mac-arm
         uses: actions/upload-artifact@v4
