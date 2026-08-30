@@ -170,9 +170,15 @@ sign_loose_binaries() {
     fi
   done
   # Re-sign nested .app bundles last so their outer signature covers what we
-  # just touched inside them.
+  # just touched inside them. NOTE: a directory ending in ".app" is not
+  # necessarily a real bundle -- Eclipse's OSGi bundle cache uses plugin-ID
+  # names like "configuration/org.eclipse.equinox.app" that happen to match
+  # the glob but aren't signable bundles at all. Only treat it as a bundle
+  # if it actually has Contents/Info.plist.
   find "$root" -type d -name "*.app" | while read -r bundle; do
-    codesign --force --deep --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" "$bundle"
+    if [[ -f "$bundle/Contents/Info.plist" ]]; then
+      codesign --force --deep --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" "$bundle"
+    fi
   done
 }
 
@@ -209,7 +215,9 @@ if [[ "$DO_SIGN" == "true" ]]; then
   find "$APP_PATH" -type f \( -name "*.dylib" -o -name "*.jnilib" -o -name "*.so" \) -print0 |
     xargs -0 -I{} codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" {}
   find "$APP_PATH" -type d -name "*.app" ! -path "$APP_PATH" | while read -r bundle; do
-    codesign --force --deep --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" "$bundle"
+    if [[ -f "$bundle/Contents/Info.plist" ]]; then
+      codesign --force --deep --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" "$bundle"
+    fi
   done
   codesign --force --deep --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" \
     --entitlements "$SCRIPT_DIR/mac-entitlements.plist" \
