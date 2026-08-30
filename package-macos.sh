@@ -164,9 +164,16 @@ sign_loose_binaries() {
   # itself; -I is what hit the "too long" buffer bug earlier.
   find "$root" -type f \( -name "*.dylib" -o -name "*.jnilib" -o -name "*.so" \) -print0 |
     xargs -0 -n 500 codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}"
-  # Extensionless executables (the "eclipse" launcher, embedded JVM binaries, etc.)
-  find "$root" -type f -perm -u+x ! -name "*.*" | while read -r f; do
+  # Extensionless executables (the "eclipse" launcher, the bundled JRE's
+  # bin/java, javac, jar, jarsigner, etc.). Deliberately NOT gated on
+  # `-perm -u+x` -- GitHub Actions artifact upload/download (and some zip
+  # round-trips) can silently strip the executable bit, which would make a
+  # permission-based filter skip these files entirely before they're ever
+  # checked or signed. Test every extensionless file with `file` instead,
+  # and restore +x on anything that turns out to be a real Mach-O binary.
+  find "$root" -type f ! -name "*.*" | while read -r f; do
     if file "$f" | grep -q "Mach-O"; then
+      chmod +x "$f"
       codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" "$f"
     fi
   done
@@ -218,6 +225,12 @@ if [[ "$DO_SIGN" == "true" ]]; then
   find "$APP_PATH" -type d -name "*.app" ! -path "$APP_PATH" | while read -r bundle; do
     if [[ -f "$bundle/Contents/Info.plist" ]]; then
       codesign --force --deep --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" "$bundle"
+    fi
+  done
+  find "$APP_PATH" -type f ! -name "*.*" | while read -r f; do
+    if file "$f" | grep -q "Mach-O"; then
+      chmod +x "$f"
+      codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" "$f"
     fi
   done
   codesign --force --deep --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" \
