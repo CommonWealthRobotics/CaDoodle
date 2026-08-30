@@ -108,13 +108,16 @@ public class CadoodleUpdater {
 	@FXML // fx:id="yesButton"
 	private Button yesButton; // Value injected by FXMLLoader
 
+	@FXML // fx:id="yesButton"
+	private Button bugfixButton;
+
 	@FXML // fx:id="noButton"
 	private Button noButton; // Value injected by FXMLLoader
 	@FXML // fx:id="noButton"
 	private Button uptodateButton;
 	@FXML // fx:id="noButton"
 	private Button selectPluginFileButton;
-	private static HashMap<String, Object> database;
+	private static Map<String, Object> database;
 
 	private String bindir;
 
@@ -143,6 +146,17 @@ public class CadoodleUpdater {
 
 	@FXML
 	void onYes(ActionEvent event) {
+		String pinFileName = bindir + "pinBugfixVersion";
+		File pinFile = new File(pinFileName);
+		if (pinFile.exists()) {
+			int[] current = tosemver(myVersionString);
+			int[] latest = tosemver(latestVersionString);
+			if (current[0] != latest[0] || current[1] != latest[1]) {
+				launchApplication();
+				return;
+			}
+		}
+
 		System.out.println("Yes path, user wants/needs to update the app");
 		yesButton.setDisable(true); // Prevent another button click
 		noButton.setDisable(true);
@@ -219,10 +233,39 @@ public class CadoodleUpdater {
 		}).start();
 	}
 
+	private static int[] tosemver(String v) {
+		if (v == null) {
+			return new int[] { 0, 0, 0 };
+		}
+		String cleaned = v.trim();
+		if (cleaned.startsWith("v") || cleaned.startsWith("V")) {
+			cleaned = cleaned.substring(1);
+		}
+		// Drop any pre-release/build metadata suffix, e.g. "1.2.3-beta" or
+		// "1.2.3+build5"
+		cleaned = cleaned.split("[-+]")[0];
+
+		String[] parts = cleaned.split("\\.");
+		int[] result = new int[3];
+		for (int i = 0; i < 3; i++) {
+			if (i < parts.length && !parts[i].isEmpty()) {
+				try {
+					result[i] = Integer.parseInt(parts[i]);
+				} catch (NumberFormatException e) {
+					result[i] = 0;
+				}
+			} else {
+				result[i] = 0;
+			}
+		}
+		return result;
+	}
+
 	private boolean launched = false;
 	private Path goloblaPinFile = null;
 	private Path pluginsZip;
 	private Path pluginExtracted;
+	private boolean noInternet;
 
 	public void launchApplication() {
 		if (launched) {
@@ -434,21 +477,89 @@ public class CadoodleUpdater {
 		return sb.toString();
 	}
 
-	public static void readCurrentVersion(String url) throws IOException, URISyntaxException {
-		System.out.println("Read current version from " + url);
-		InputStream is = new URI(url).toURL().openStream();
+	public void readCurrentVersion(String url) throws IOException, URISyntaxException {
+		String pinFileName = bindir + "pinBugfixVersion";
+		File pinFile = new File(pinFileName);
+		boolean pinBugfix = pinFile.exists();
+
+		// Always fetch the latest 10 releases in one call - used both for bugfix
+		// pinning (major.minor match) and normal updates (highest semver in the batch).
+		String requestUrl = url + "?per_page=10";
+		System.out.println("Read current version from " + requestUrl);
+
+		InputStream is = new URI(requestUrl).toURL().openStream();
 		try {
 			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 			String jsonText = readAll(rd);
 			System.out.println("Got file contents " + jsonText);
-			// Create the type, this tells GSON what datatypes to instantiate when parsing
-			// and saving the json
-			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {
-			}.getType();
-			// create the gson object, this is the parsing factory
+
 			Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-			database = gson.fromJson(jsonText, TT_mapStringString);
+
+			Type TT_listOfMaps = new TypeToken<List<Map<String, Object>>>() {
+			}.getType();
+			List<Map<String, Object>> releases = gson.fromJson(jsonText, TT_listOfMaps);
+			System.out.println("Got " + (releases == null ? 0 : releases.size()) + " releases");
+
+			Map<String, Object> selectedRelease = null;
+
+			if (releases != null && !releases.isEmpty()) {
+				if (pinBugfix) {
+					int[] current = tosemver(myVersionString);
+					for (Map<String, Object> release : releases) {
+						String tag = (String) release.get("tag_name");
+						int[] candidate;
+						try {
+							candidate = tosemver(tag);
+						} catch (Exception e) {
+							System.out.println("Skipping unparseable tag " + tag);
+							continue;
+						}
+						if (candidate[0] == current[0] && candidate[1] == current[1]) {
+							selectedRelease = release;
+							System.out.println("Found matching bugfix release " + tag);
+							break;
+						}
+					}
+					if (selectedRelease == null) {
+						System.out.println("No release in the latest batch matches major " + current[0] + " minor "
+								+ current[1] + " - falling back to newest release");
+						selectedRelease = releases.get(0);
+					}
+				} else {
+					// Not pinned: scan all 10 for the highest semver, rather than
+					// assuming the first entry (newest by date) is the highest version.
+					int[] bestVersion = null;
+					for (Map<String, Object> release : releases) {
+						String tag = (String) release.get("tag_name");
+						int[] candidate;
+						try {
+							candidate = tosemver(tag);
+						} catch (Exception e) {
+							System.out.println("Skipping unparseable tag " + tag);
+							continue;
+						}
+						if (bestVersion == null || compareSemver(candidate, bestVersion) > 0) {
+							bestVersion = candidate;
+							selectedRelease = release;
+							System.out.println("New best candidate " + tag);
+						}
+					}
+					if (selectedRelease == null) {
+						System.out.println("No parseable tags found - falling back to newest release");
+						selectedRelease = releases.get(0);
+					}
+				}
+			}
+
+			database = selectedRelease;
 			System.out.println("Database:\n" + database);
+
+			if (database == null) {
+				System.err.println("FAIL no releases were found");
+				System.exit(1);
+				return;
+			}
+
 			latestVersionString = (String) database.get("tag_name");
 			@SuppressWarnings("unchecked")
 			List<Map<String, Object>> assets = (List<Map<String, Object>>) database.get("assets");
@@ -475,7 +586,6 @@ public class CadoodleUpdater {
 					sizeOfZip = ((Double) key.get("size")).longValue();
 					System.out.println(downloadZip + " Size " + sizeOfZip + " bytes");
 				}
-
 			}
 			if (downloadJarURL == null) {
 				System.err.println("FAIL the Jar is missing in release " + latestVersionString);
@@ -485,6 +595,68 @@ public class CadoodleUpdater {
 			is.close();
 		}
 	}
+
+	// Returns >0 if a > b, <0 if a < b, 0 if equal. Assumes int[3]: {major, minor,
+	// patch}.
+	private static int compareSemver(int[] a, int[] b) {
+		for (int i = 0; i < Math.min(a.length, b.length); i++) {
+			int diff = a[i] - b[i];
+			if (diff != 0)
+				return diff;
+		}
+		return 0;
+	}
+//	public static void readCurrentVersion(String url) throws IOException, URISyntaxException {
+//		System.out.println("Read current version from " + url);
+//		InputStream is = new URI(url).toURL().openStream();
+//		try {
+//			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+//			String jsonText = readAll(rd);
+//			System.out.println("Got file contents " + jsonText);
+//			// Create the type, this tells GSON what datatypes to instantiate when parsing
+//			// and saving the json
+//			Type TT_mapStringString = new TypeToken<HashMap<String, Object>>() {
+//			}.getType();
+//			// create the gson object, this is the parsing factory
+//			Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+//			database = gson.fromJson(jsonText, TT_mapStringString);
+//			System.out.println("Database:\n" + database);
+//			latestVersionString = (String) database.get("tag_name");
+//			@SuppressWarnings("unchecked")
+//			List<Map<String, Object>> assets = (List<Map<String, Object>>) database.get("assets");
+//			downloadJarURL = null;
+//			System.out.println("Assets:\n" + assets);
+//			for (Map<String, Object> key : assets) {
+//				String string = (String) key.get("name");
+//
+//				System.out.println("Checking " + string);
+//				if (string.equals(jarName)) {
+//					downloadJarURL = (String) key.get("browser_download_url");
+//					sizeOfJar = ((Double) key.get("size")).longValue();
+//					System.out.println(downloadJarURL + " Size " + sizeOfJar + " bytes");
+//				} else
+//					System.out.println(string + " is not " + jarName);
+//				if (string.equals("jvm.json")) {
+//					downloadJsonURL = (String) key.get("browser_download_url");
+//					sizeOfJson = ((Double) key.get("size")).longValue();
+//					System.out.println(downloadJsonURL + " Size " + sizeOfJson + " bytes");
+//				}
+//
+//				if (string.equals("gitcache.zip")) {
+//					downloadZip = (String) key.get("browser_download_url");
+//					sizeOfZip = ((Double) key.get("size")).longValue();
+//					System.out.println(downloadZip + " Size " + sizeOfZip + " bytes");
+//				}
+//
+//			}
+//			if (downloadJarURL == null) {
+//				System.err.println("FAIL the Jar is missing in release " + latestVersionString);
+//				System.exit(1);
+//			}
+//		} finally {
+//			is.close();
+//		}
+//	}
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void onExtractLTS(ActionEvent ev) {
@@ -510,6 +682,39 @@ public class CadoodleUpdater {
 	void onFirstYes(ActionEvent ev) {
 		runPluginProcess();
 		onYes(ev);
+	}
+
+	@FXML // This method is called by the FXMLLoader when initialization is complete
+	void onBugfixYes(ActionEvent ev) {
+
+		runPluginProcess();
+		new Thread(() -> {
+			String pinFileName = bindir + "pinBugfixVersion";
+			File pinFile = new File(pinFileName);
+			if (!pinFile.exists()) {
+				try {
+					pinFile.createNewFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			Platform.runLater(() -> {
+				if (!noInternet) {
+					try {
+						readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases");
+						binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " MB");
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						noInternet = true;
+					}
+				}
+				currentVersion.setText(latestVersionString);
+				onYes(ev);
+			});
+		}).start();
+
 	}
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
@@ -611,24 +816,15 @@ public class CadoodleUpdater {
 		myVersionFileString = bindir + "currentversion.txt";
 		String pinFileName = bindir + "pinVersion";
 		File pinFile = new File(pinFileName);
-		boolean noInternet = false;
+		noInternet = false;
 
 		if (pinFile.exists()) {
 			noInternet = true;
 		}
 
-		if (!noInternet) {
-			try {
-				readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases/latest");
-				binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " MB");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				noInternet = true;
-			}
-		}
 
-		currentVersion.setText(latestVersionString);
+
+		
 		myVersionFile = new File(myVersionFileString);
 		bindirFile = new File(bindir);
 		if (!bindirFile.exists())
@@ -671,6 +867,17 @@ public class CadoodleUpdater {
 			noButton.setVisible(true);
 			try {
 				myVersionString = new String(Files.readAllBytes(Paths.get(myVersionFileString))).trim();
+				if (!noInternet) {
+					try {
+						readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases");
+						binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " MB");
+						currentVersion.setText(latestVersionString);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						noInternet = true;
+					}
+				}
 				previousVersion.setText(myVersionString);
 				if (myVersionString.length() < 3) {
 					onYes(null);

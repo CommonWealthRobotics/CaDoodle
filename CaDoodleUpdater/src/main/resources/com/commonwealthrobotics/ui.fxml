@@ -123,9 +123,10 @@
                   </ImageView>
                   <HBox fx:id="initialStartupControls" alignment="CENTER_LEFT" spacing="20.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                      <children>
-                        <GridPane hgap="10.0" prefWidth="460.0" vgap="10.0">
+                        <GridPane hgap="10.0" vgap="10.0">
                           <columnConstraints>
                             <ColumnConstraints hgrow="NEVER" />
+                              <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
                             <ColumnConstraints hgrow="NEVER" />
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                           </columnConstraints>
@@ -144,20 +145,26 @@
                                     <String fx:value="image-button-focus" />
                                  </styleClass>
                               </Button>
-                              <Button mnemonicParsing="false" onAction="#onExtractLTS" text="Use LTS (No Internet)" GridPane.columnIndex="2">
+                              <Button mnemonicParsing="false" onAction="#onExtractLTS" text="Use LTS (No Internet)" GridPane.columnIndex="3">
                                  <styleClass>
                                     <String fx:value="image-button" />
                                     <String fx:value="image-button-focus" />
                                  </styleClass>
                               </Button>
-                              <Label text="Plugins:" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <RadioButton fx:id="downloadPlugins" mnemonicParsing="false" onAction="#pluginOptionChange" selected="true" text="Download All In Background" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                              <Label text="Plugins:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <RadioButton fx:id="downloadPlugins" mnemonicParsing="false" onAction="#pluginOptionChange" selected="true" text="Download All In Background" GridPane.columnIndex="3" GridPane.rowIndex="1">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="plugins" />
                                  </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="useOsPlugins" mnemonicParsing="false" onAction="#pluginOptionChange" text="Use OS Only (No Internet)" toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <RadioButton fx:id="selectPluginFile" mnemonicParsing="false" onAction="#pluginOptionChange" text="Select File... (No Internet)" toggleGroup="$plugins" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                              <RadioButton fx:id="useOsPlugins" mnemonicParsing="false" onAction="#pluginOptionChange" text="Use OS Only (No Internet)" toggleGroup="$plugins" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                              <RadioButton fx:id="selectPluginFile" mnemonicParsing="false" onAction="#pluginOptionChange" text="Select File... (No Internet)" toggleGroup="$plugins" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                              <Button fx:id="bugfixButton" mnemonicParsing="false" onAction="#onBugfixYes" text="Bugfix Updates Only" GridPane.columnIndex="2">
+                                 <styleClass>
+                                    <String fx:value="image-button" />
+                                    <String fx:value="image-button-focus" />
+                                 </styleClass>
+                              </Button>
                            </children>
                         </GridPane>
                      </children>
