@@ -145,11 +145,8 @@ sign_natives_in_jars() {
       local work
       work=$(mktemp -d)
       ( cd "$work" && "$JAVA_HOME/bin/jar" xf "$jarfile" )
-      find "$work" -type f \( -name "*.dylib" -o -name "*.jnilib" \) | while read -r nativefile; do
-        echo "    Signing $(basename "$nativefile")"
-        codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" \
-          --sign "${SIGN_IDENTITY_FULL}" "$nativefile"
-      done
+      find "$work" -type f \( -name "*.dylib" -o -name "*.jnilib" \) -print0 |
+        xargs -0 -n 500 codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}"
       ( cd "$work" && "$JAVA_HOME/bin/jar" cf "$jarfile.new" . )
       mv "$jarfile.new" "$jarfile"
       rm -rf "$work"
@@ -161,8 +158,12 @@ sign_natives_in_jars() {
 # ship with no signature, or one Apple won't accept from us.
 sign_loose_binaries() {
   local root="$1"
+  # Batch many paths onto each codesign invocation instead of forking a new
+  # process per file -- codesign accepts multiple paths in one call. Use
+  # `xargs -n` (not -I) so xargs handles the batching/ARG_MAX splitting
+  # itself; -I is what hit the "too long" buffer bug earlier.
   find "$root" -type f \( -name "*.dylib" -o -name "*.jnilib" -o -name "*.so" \) -print0 |
-    xargs -0 -I{} codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" {}
+    xargs -0 -n 500 codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}"
   # Extensionless executables (the "eclipse" launcher, embedded JVM binaries, etc.)
   find "$root" -type f -perm -u+x ! -name "*.*" | while read -r f; do
     if file "$f" | grep -q "Mach-O"; then
@@ -213,7 +214,7 @@ if [[ "$DO_SIGN" == "true" ]]; then
   # Catch anything the pre-pass missed (files that only exist after jpackage
   # assembled the bundle), innermost first.
   find "$APP_PATH" -type f \( -name "*.dylib" -o -name "*.jnilib" -o -name "*.so" \) -print0 |
-    xargs -0 -I{} codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" {}
+    xargs -0 -n 500 codesign --force --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}"
   find "$APP_PATH" -type d -name "*.app" ! -path "$APP_PATH" | while read -r bundle; do
     if [[ -f "$bundle/Contents/Info.plist" ]]; then
       codesign --force --deep --timestamp --options runtime "${KEYCHAIN_ARGS[@]}" --sign "${SIGN_IDENTITY_FULL}" "$bundle"
