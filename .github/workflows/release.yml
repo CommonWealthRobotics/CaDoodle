@@ -360,7 +360,7 @@ jobs:
           NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
           NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
           NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
-        run: bash package-macos-x86.sh
+        run: bash publish-macos-x86.sh
 
       - name: Upload result for job Mac-x86
         uses: actions/upload-artifact@v4
