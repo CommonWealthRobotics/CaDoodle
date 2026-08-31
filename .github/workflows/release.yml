@@ -280,7 +280,7 @@ jobs:
           NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
         run: |
            curl -L "${{ env.BOWLER_STUDIO_INSTALL_BASE_URL }}/${{ env.BOWLER_KERNEL_VERSION }}/BowlerStudioInstall-macos-arm.zip" -o BowlerStudioInstall-macos-arm.zip
-           bash package-macos.sh
+           bash publish-macos-x86.sh
 
       - name: Upload result for job Mac-arm
         uses: actions/upload-artifact@v4
