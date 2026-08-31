@@ -484,7 +484,7 @@ public class CadoodleUpdater {
 
 		// Always fetch the latest 10 releases in one call - used both for bugfix
 		// pinning (major.minor match) and normal updates (highest semver in the batch).
-		String requestUrl = url + "?per_page=10";
+		String requestUrl = url + "?per_page=20";
 		System.out.println("Read current version from " + requestUrl);
 
 		InputStream is = new URI(requestUrl).toURL().openStream();
