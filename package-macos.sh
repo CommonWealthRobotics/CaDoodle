@@ -50,7 +50,7 @@ cp CaDoodle-ApplicationInstall.zip $DIR/
 # that's a separate pre-existing gap from this signing fix.
 if [[ $(uname -m) == 'arm64' ]]; then
     mkdir -p $DIR/BowlerStudioInstall/
-    #unzip -q -o BowlerStudioInstall-macos-arm.zip -d $DIR/BowlerStudioInstall/
+    unzip -q -o BowlerStudioInstall-macos-arm.zip -d $DIR/BowlerStudioInstall/
 fi
 echo -e "\n\nTarget Dir: $DIR"
 ls -al $DIR/
@@ -247,17 +247,21 @@ rm -rf release
 mkdir release
 DMG="release/$NAME-MacOS-$ARCH.dmg"
 
-# Package the (already-signed, if DO_SIGN) app-image straight into a DMG.
-# Building the DMG from an existing --app-image -- instead of asking
-# jpackage to build + sign + package in one shot -- means jpackage never
-# gets a chance to touch our nested jars/binaries again after we fixed them.
-$JAVA_HOME/bin/jpackage --type dmg \
-  --app-image "$APP_PATH" \
-  --name $NAME \
-  --dest "$SCRIPT_DIR" \
-  --app-version "$VERSION"
-
-mv "$NAME-$VERSION.dmg" "$DMG"
+# Package the already-signed (if DO_SIGN) app-image into a DMG using
+# hdiutil, NOT jpackage. jpackage's own `--type dmg --app-image <dir>` step
+# still runs its default signing pass over the main launcher and embedded
+# runtime it manages (Contents/MacOS/CaDoodle, Contents/runtime/...) even
+# when reusing an existing app-image, and since no --mac-sign identity is
+# given to it, that pass applies an AD-HOC signature ("-") -- no Developer
+# ID, no --options runtime, no --timestamp -- silently overwriting the
+# proper signatures we just put on those exact files. hdiutil just packages
+# the folder as-is and never touches code signatures.
+echo "Creating DMG with hdiutil..."
+DMG_STAGING=$(mktemp -d)
+cp -R "$APP_PATH" "$DMG_STAGING/"
+ln -s /Applications "$DMG_STAGING/Applications"
+hdiutil create -volname "$NAME" -srcfolder "$DMG_STAGING" -ov -format UDZO "$DMG"
+rm -rf "$DMG_STAGING"
 
 # ---- Notarize + staple (only when the build was signed) ----
 if [[ "$DO_SIGN" == "true" ]]; then
