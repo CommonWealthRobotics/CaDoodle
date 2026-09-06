@@ -33,6 +33,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -77,6 +78,8 @@ public class CadoodleUpdater {
 	private ResourceBundle resources;
 	@FXML
 	private HBox initialStartupControls;
+	@FXML
+	private GridPane controlsGrid;
 	@FXML
 	private HBox pluginFileBox;
 
@@ -163,7 +166,8 @@ public class CadoodleUpdater {
 		progressBar.setDisable(false);
 		infoBar.setText("Downloading CaDoodle Application, please wait...");
 		progressLabel.setText("Downloading 0.0%");
-		initialStartupControls.setVisible(false);
+		controlsGrid.getChildren().remove(initialStartupControls);
+		//initialStartupControls.setVisible(false);
 		pluginFileBox.setVisible(false);
 		new Thread(() -> {
 
@@ -661,7 +665,9 @@ public class CadoodleUpdater {
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void onExtractLTS(ActionEvent ev) {
 		runPluginProcess();
-		initialStartupControls.setVisible(false);
+		controlsGrid.getChildren().remove(initialStartupControls);
+
+		//initialStartupControls.setVisible(false);
 		pluginFileBox.setVisible(false);
 		new Thread(() -> {
 			String pinFileName = bindir + "pinVersion";
@@ -836,7 +842,9 @@ public class CadoodleUpdater {
 			if (!pluginDir.toFile().exists())
 				pluginDir.toFile().mkdirs();
 			boolean MyNoInternet = noInternet;
-			initialStartupControls.setVisible(false);
+			controlsGrid.getChildren().remove(initialStartupControls);
+
+			
 			pluginFileBox.setVisible(false);
 			new Thread(() -> {
 				setupDefaultVersion();
@@ -850,7 +858,8 @@ public class CadoodleUpdater {
 				boolean runDef = MyNoInternet || globalpin;
 
 				Platform.runLater(() -> {
-					initialStartupControls.setVisible(true);
+					controlsGrid.getChildren().add(initialStartupControls);
+
 					pluginFileBox.setVisible(true);
 					// uptodateButton.setDisable(noInternet);
 					yesButton.setVisible(false);
@@ -861,7 +870,8 @@ public class CadoodleUpdater {
 			}).start();
 			return;
 		} else {
-			initialStartupControls.setVisible(false);
+			controlsGrid.getChildren().remove(initialStartupControls);
+
 			pluginFileBox.setVisible(false);
 			yesButton.setVisible(true);
 			noButton.setVisible(true);
@@ -870,7 +880,15 @@ public class CadoodleUpdater {
 				if (!noInternet) {
 					try {
 						readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases");
-						binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " MB");
+						String bugfixFileName = bindir + "pinBugfixVersion";
+						File bugfixFile = new File(bugfixFileName);
+						String updateMode="Nightly Feature";
+						if (pinFile.exists()) {
+							updateMode="LTS Pin";
+						}if(bugfixFile.exists()) {
+							updateMode="Bug-fix";
+						}
+						binary.setText(updateMode+" Update Mode");
 						currentVersion.setText(latestVersionString);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -899,7 +917,7 @@ public class CadoodleUpdater {
 				}
 				// Internet access available and an update is available
 				// Allow user to download the update or just start the application
-				infoBar.setText("An update is available.\nWould you like to download it now?");
+				infoBar.setText("A new version of CaDoodle is available.\nSize: " + (sizeOfJar / 1000000) + " MB\n\nWould you like to download it now?");
 				yesButton.setDisable(false);
 				noButton.setDisable(false);
 			}
@@ -944,7 +962,7 @@ public class CadoodleUpdater {
 					VBox root = new VBox(10, label, progressBar);
 					root.setPadding(new Insets(20));
 					String css = getClass().getResource("/com/commonwealthrobotics/stylesheet.css").toExternalForm();
-					root.getStylesheets().add(css);
+					// root.getStylesheets().add(css);
 					// progressStage.initOwner(stage);
 					progressStage.initModality(Modality.APPLICATION_MODAL);
 					progressStage.setTitle("Downloading Plugins...");
