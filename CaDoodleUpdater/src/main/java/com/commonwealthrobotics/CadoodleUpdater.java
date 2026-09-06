@@ -709,7 +709,7 @@ public class CadoodleUpdater {
 				if (!noInternet) {
 					try {
 						readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases");
-						binary.setText(project + "\n" + repoName + "\n" + jarName + "\n" + (sizeOfJar / 1000000) + " MB");
+						binary.setText( jarName + " " + (sizeOfJar / 1000000) + " MB");
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -935,10 +935,10 @@ public class CadoodleUpdater {
 //			return;
 
 		new Thread(() -> {
+			Label label = new Label("Starting download...");
 			if (downloadPlugins.isSelected()) {
 				ProgressBar progressBar = new ProgressBar(0);
 				progressBar.setPrefWidth(300);
-				Label label = new Label("Starting download...");
 				try {
 					pluginsZip = Files.createTempFile("BowlerStudioInstall", ".zip");
 				} catch (IOException e) {
@@ -1040,7 +1040,7 @@ public class CadoodleUpdater {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} finally {
-					Platform.runLater(progressStage::close);
+					
 				}
 				pluginsZip.toFile().deleteOnExit();
 			}
@@ -1052,17 +1052,18 @@ public class CadoodleUpdater {
 					e.printStackTrace();
 				}
 				try {
-					unzip(pluginsZip.toFile(), pluginDir.toString());
+					unzip(pluginsZip.toFile(), pluginDir.toString(),label);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
+			Platform.runLater(progressStage::close);
 
 		}).start();
 	}
 
-	public static void unzip(File path, String dir) throws Exception {
+	public static void unzip(File path, String dir,Label label ) throws Exception {
 		Path destFolderPath = new File(dir).toPath();
 		System.out.println("Unzipping " + path);
 		try (ZipFile zipFile = ZipFile.builder().setFile(path).get()) {
@@ -1073,6 +1074,13 @@ public class CadoodleUpdater {
 				if (entryPath.normalize().startsWith(destFolderPath.normalize())) {
 					if (entry.isDirectory()) {
 						Files.createDirectories(entryPath);
+						String x = "Extracting "+entryPath.toFile().getAbsolutePath();
+						System.out.println(x);
+						Platform.runLater(() -> {
+							
+								label.setText(x);
+							
+						});
 					} else {
 						Files.createDirectories(entryPath.getParent());
 
