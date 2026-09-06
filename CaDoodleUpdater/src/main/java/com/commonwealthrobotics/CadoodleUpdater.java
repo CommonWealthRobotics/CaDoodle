@@ -938,7 +938,7 @@ public class CadoodleUpdater {
 			Label label = new Label("Starting download...");
 			if (downloadPlugins.isSelected()) {
 				ProgressBar progressBar = new ProgressBar(0);
-				progressBar.setPrefWidth(300);
+				progressBar.setPrefWidth(800);
 				try {
 					pluginsZip = Files.createTempFile("BowlerStudioInstall", ".zip");
 				} catch (IOException e) {
