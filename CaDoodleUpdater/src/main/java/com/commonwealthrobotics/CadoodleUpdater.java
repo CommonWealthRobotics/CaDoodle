@@ -167,7 +167,7 @@ public class CadoodleUpdater {
 		infoBar.setText("Downloading CaDoodle Application, please wait...");
 		progressLabel.setText("Downloading 0.0%");
 		controlsGrid.getChildren().remove(initialStartupControls);
-		//initialStartupControls.setVisible(false);
+		// initialStartupControls.setVisible(false);
 		pluginFileBox.setVisible(false);
 		new Thread(() -> {
 
@@ -667,7 +667,7 @@ public class CadoodleUpdater {
 		runPluginProcess();
 		controlsGrid.getChildren().remove(initialStartupControls);
 
-		//initialStartupControls.setVisible(false);
+		// initialStartupControls.setVisible(false);
 		pluginFileBox.setVisible(false);
 		new Thread(() -> {
 			String pinFileName = bindir + "pinVersion";
@@ -709,7 +709,7 @@ public class CadoodleUpdater {
 				if (!noInternet) {
 					try {
 						readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases");
-						binary.setText( jarName + " " + (sizeOfJar / 1000000) + " MB");
+						binary.setText(jarName + " " + (sizeOfJar / 1000000) + " MB");
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -828,9 +828,6 @@ public class CadoodleUpdater {
 			noInternet = true;
 		}
 
-
-
-		
 		myVersionFile = new File(myVersionFileString);
 		bindirFile = new File(bindir);
 		if (!bindirFile.exists())
@@ -838,13 +835,13 @@ public class CadoodleUpdater {
 		Path homebin = Path.of(System.getProperty("user.home"), "bin");
 		Path pluginDir = homebin.resolve("BowlerStudioInstall");
 
-		if (!myVersionFile.exists() || !pluginDir.toFile().exists()) {
+		boolean isFirstRun = !myVersionFile.exists();
+		if (isFirstRun || !pluginDir.toFile().exists()) {
 			if (!pluginDir.toFile().exists())
 				pluginDir.toFile().mkdirs();
 			boolean MyNoInternet = noInternet;
 			controlsGrid.getChildren().remove(initialStartupControls);
 
-			
 			pluginFileBox.setVisible(false);
 			new Thread(() -> {
 				setupDefaultVersion();
@@ -852,7 +849,7 @@ public class CadoodleUpdater {
 				if (goloblaPinFile != null) {
 					File gpinfile = goloblaPinFile.toFile();
 					if (gpinfile.exists()) {
-						globalpin = true;
+						globalpin = isFirstRun;
 					}
 				}
 				boolean runDef = MyNoInternet || globalpin;
@@ -861,7 +858,7 @@ public class CadoodleUpdater {
 					controlsGrid.getChildren().add(initialStartupControls);
 
 					pluginFileBox.setVisible(true);
-					// uptodateButton.setDisable(noInternet);
+					// uptodateButton.setDisable(noInternet);s
 					yesButton.setVisible(false);
 					noButton.setVisible(false);
 					if (runDef)
@@ -882,13 +879,14 @@ public class CadoodleUpdater {
 						readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases");
 						String bugfixFileName = bindir + "pinBugfixVersion";
 						File bugfixFile = new File(bugfixFileName);
-						String updateMode="Nightly Feature";
+						String updateMode = "Nightly Feature";
 						if (pinFile.exists()) {
-							updateMode="LTS Pin";
-						}if(bugfixFile.exists()) {
-							updateMode="Bug-fix";
+							updateMode = "LTS Pin";
 						}
-						binary.setText(updateMode+" Update Mode");
+						if (bugfixFile.exists()) {
+							updateMode = "Bug-fix";
+						}
+						binary.setText(updateMode + " Update Mode");
 						currentVersion.setText(latestVersionString);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -917,7 +915,8 @@ public class CadoodleUpdater {
 				}
 				// Internet access available and an update is available
 				// Allow user to download the update or just start the application
-				infoBar.setText("A new version of CaDoodle is available.\nSize: " + (sizeOfJar / 1000000) + " MB\n\nWould you like to download it now?");
+				infoBar.setText("A new version of CaDoodle is available.\nSize: " + (sizeOfJar / 1000000)
+						+ " MB\n\nWould you like to download it now?");
 				yesButton.setDisable(false);
 				noButton.setDisable(false);
 			}
@@ -1040,7 +1039,7 @@ public class CadoodleUpdater {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} finally {
-					
+
 				}
 				pluginsZip.toFile().deleteOnExit();
 			}
@@ -1052,7 +1051,7 @@ public class CadoodleUpdater {
 					e.printStackTrace();
 				}
 				try {
-					unzip(pluginsZip.toFile(), pluginDir.toString(),label);
+					unzip(pluginsZip.toFile(), pluginDir.toString(), label);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -1063,7 +1062,7 @@ public class CadoodleUpdater {
 		}).start();
 	}
 
-	public static void unzip(File path, String dir,Label label ) throws Exception {
+	public static void unzip(File path, String dir, Label label) throws Exception {
 		Path destFolderPath = new File(dir).toPath();
 		System.out.println("Unzipping " + path);
 		try (ZipFile zipFile = ZipFile.builder().setFile(path).get()) {
@@ -1074,12 +1073,12 @@ public class CadoodleUpdater {
 				if (entryPath.normalize().startsWith(destFolderPath.normalize())) {
 					if (entry.isDirectory()) {
 						Files.createDirectories(entryPath);
-						String x = "Extracting "+entryPath.toFile().getAbsolutePath();
+						String x = "Extracting " + entryPath.toFile().getAbsolutePath();
 						System.out.println(x);
 						Platform.runLater(() -> {
-							
-								label.setText(x);
-							
+
+							label.setText(x);
+
 						});
 					} else {
 						Files.createDirectories(entryPath.getParent());
