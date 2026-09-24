@@ -49,7 +49,7 @@ cp CaDoodle-ApplicationInstall.zip $DIR/
 # as in the original script. If the x86_64 build is meant to bundle it too,
 # that's a separate pre-existing gap from this signing fix.
 if [[ $(uname -m) == 'arm64' ]]; then
-    mkdir -p $DIR/BowlerStudioInstall/
+    #mkdir -p $DIR/BowlerStudioInstall/
     #unzip -q -o BowlerStudioInstall-macos-arm.zip -d $DIR/BowlerStudioInstall/
 fi
 echo -e "\n\nTarget Dir: $DIR"
