@@ -120,6 +120,18 @@ public class JvmManager {
 				System.out.println("Not extracting, VM exists " + dest.getAbsolutePath());
 			}
 			String cmd = bindir + name + "/bin/java" + (CadoodleUpdater.isWin() ? ".exe" : "") + " ";
+			File cmdFile = new File(cmd);
+			if(!cmdFile.exists() && CadoodleUpdater.isMac()) {
+				for(String s:cmdFile.list()) {
+					Path working = cmdFile.toPath().resolve(s);
+					Path newHome = working.resolve("Contents").resolve("Home");
+					File file = newHome.resolve("bin").resolve("java").toFile();
+					if(file.exists()) {
+						cmd=file.getAbsolutePath();
+						break;
+					}
+				}
+			}
 			// Mac OS set the dock icon
 			String iconPath = extractIconToTemp();
 			if (iconPath != null) {
