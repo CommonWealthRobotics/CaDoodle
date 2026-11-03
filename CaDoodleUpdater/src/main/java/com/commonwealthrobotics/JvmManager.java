@@ -134,6 +134,13 @@ public class JvmManager {
 						cmd=file.getAbsolutePath();
 						break;
 					}
+					newHome = working.resolve("Home");
+					file = newHome.resolve("bin").resolve("java").toFile();
+					if(file.exists()) {
+						cmd=file.getAbsolutePath();
+						break;
+					}
+
 				}
 			}
 			CadoodleUpdater.JAVA_HOME = destinationFile.getAbsolutePath();
