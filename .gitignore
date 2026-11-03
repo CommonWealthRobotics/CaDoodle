@@ -17,6 +17,7 @@ build
 /BowlerLauncher/
 HatRack*
 /zulu*.zip*
+jvm/jvm.json
 /zulu*.tar*
 **.deb
 release

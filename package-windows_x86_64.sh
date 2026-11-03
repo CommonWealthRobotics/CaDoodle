@@ -10,23 +10,14 @@ else
 fi
 
 
-#https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-fx-jdk17.0.11-win_x64.zip
-#   zulu17.50.19-ca-fx-jdk17.0.11-win_x64
-JVM=zulu25.36.15-ca-fx-jdk25.0.4-win_x64
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 set -e
-ZIP=$JVM.zip
-export JAVA_HOME="$HOME/bin/java25/"
-if test -d "$JAVA_HOME/$JVM/"; then
-  echo "$JAVA_HOME exists."
-else
-  mkdir -p "$JAVA_HOME"
-  curl https://cdn.azul.com/zulu/bin/$ZIP -o $ZIP
-  #unzip $ZIP -d $JAVA_HOME
-  7z x $ZIP -o"$JAVA_HOME"
-  mv "$JAVA_HOME/$JVM/"* "$JAVA_HOME/"
-fi
+# JVM from jvm.json: download+install to the shared root and resolve JAVA_HOME
+JVM_SCRIPTS=$SCRIPT_DIR/jvm
+bash $JVM_SCRIPTS/installJdk.sh
+JVM_ARCHIVE=$(bash $JVM_SCRIPTS/getJdkArchiveFile.sh)
+export JAVA_HOME=$(bash $JVM_SCRIPTS/getJdkHome.sh)
 echo "Compile with gradle"
 ./gradlew shadowJar
 echo "Test jar in: $SCRIPT_DIR"
@@ -49,7 +40,7 @@ magick your_image_16.png your_image_32.png your_image_48.png your_image_64.png y
 PACKAGE="$JAVA_HOME/bin/jpackage.exe"
 mkdir -p "$INPUT_DIR"
 cp "$DIR/$JAR_NAME" "$INPUT_DIR/"
-cp zulu*jdk*-win_x64.zip "$INPUT_DIR/"
+cp $JVM_SCRIPTS/$JVM_ARCHIVE "$INPUT_DIR/"
 cp CaDoodle-ApplicationInstall.zip "$INPUT_DIR/"
 
 export ARCH=x86_64

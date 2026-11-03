@@ -14,26 +14,19 @@ fi
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ARCH=x86_64
-JVM=zulu25.32.21-ca-fx-jdk25.0.2-macosx_x64
 if [[ $(uname -m) == 'arm64' ]]; then
   ARCH=arm64
-  echo "Apple Silicon Mac detected https://cdn.azul.com/zulu/bin/zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64.tar.gz"
-  JVM=zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64
+  export JVM_KEY=Mac-aarch64
 else
-  echo "Intel Mac detected https://cdn.azul.com/zulu/bin/zulu25.32.21-ca-fx-jdk25.0.2-macosx_aarch64_x64.tar.gz"
+  export JVM_KEY=Mac-x64
 fi
 
-ZIP=$JVM.tar.gz
-export JAVA_HOME=$HOME/bin/java17/
-if test -d $JAVA_HOME/$JVM/; then
-  echo "$JAVA_HOME exists."
-else
-    rm -rf $JAVA_HOME
-    mkdir -p $JAVA_HOME
-    curl https://cdn.azul.com/zulu/bin/$ZIP -o $ZIP
-    tar -xvzf $ZIP -C $JAVA_HOME
-    mv $JAVA_HOME/$JVM/* $JAVA_HOME/
-fi
+# JVM from jvm.json: download+install to the shared root and resolve JAVA_HOME
+set -e
+JVM_SCRIPTS=$SCRIPT_DIR/jvm
+bash $JVM_SCRIPTS/installJdk.sh
+JVM_ARCHIVE=$(bash $JVM_SCRIPTS/getJdkArchiveFile.sh)
+export JAVA_HOME=$(bash $JVM_SCRIPTS/getJdkHome.sh)
 
 ./gradlew shadowJar
 echo "Test jar in: $SCRIPT_DIR"
@@ -42,7 +35,7 @@ INPUT_DIR="$SCRIPT_DIR/input"
 JAR_NAME=CaDoodleUpdater.jar
 echo "Test jar complete"
 
-cp zulu*jdk*-macosx_*.zip $DIR/
+cp $JVM_SCRIPTS/$JVM_ARCHIVE $DIR/
 cp CaDoodle-ApplicationInstall.zip $DIR/
 # NOTE: BowlerStudioInstall (the vendored Eclipse/Groovy/jline install that was
 # causing notarization failures) is only unpacked on the arm64 leg today, same

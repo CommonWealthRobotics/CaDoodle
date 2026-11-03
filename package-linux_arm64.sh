@@ -15,19 +15,12 @@ fi
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 export ARCH=arm64
-JVM=zulu25.36.15-ca-fx-jdk25.0.4-linux_aarch64
+# JVM from jvm.json: download+install to the shared root and resolve JAVA_HOME
 set -e
-ZIP=$JVM.tar.gz
-export JAVA_HOME=$HOME/bin/java17/
-if test -d $JAVA_HOME/$JVM/; then
-  echo "$JAVA_HOME exists."
-else
-	rm -rf $JAVA_HOME
-	mkdir -p $JAVA_HOME
-	wget https://cdn.azul.com/zulu/bin/$ZIP
-	tar -xvzf $ZIP -C $JAVA_HOME
-	mv $JAVA_HOME/$JVM/* $JAVA_HOME/
-fi
+JVM_SCRIPTS=$SCRIPT_DIR/jvm
+bash $JVM_SCRIPTS/installJdk.sh
+JVM_ARCHIVE=$(bash $JVM_SCRIPTS/getJdkArchiveFile.sh)
+export JAVA_HOME=$(bash $JVM_SCRIPTS/getJdkHome.sh)
 
 ./gradlew shadowJar
 echo "Test jar in: $SCRIPT_DIR"
@@ -38,7 +31,7 @@ JAR_NAME=CaDoodleUpdater.jar
 echo "Test jar complete"
 ls -al $JAVA_HOME
 
-cp zulu*jdk*-linux_aarch64.tar.gz $DIR/
+cp $JVM_SCRIPTS/$JVM_ARCHIVE $DIR/
 cp CaDoodle-ApplicationInstall.zip $DIR/
 
 ICON=$NAME.png
