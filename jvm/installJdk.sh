@@ -8,7 +8,8 @@
 # non-zero if the JVM is missing or broken.
 # Re-run any time jvm.json changes: an existing install is replaced when the pinned
 # archive differs. Override the install root with JDK_INSTALL_ROOT, the jvm.json key
-# with JVM_KEY, and the expected major version with JVM_MAJOR_VERSION.
+# with JVM_KEY, and the expected major version with JVM_MAJOR_VERSION. A locally
+# pre-downloaded archive can be reused with JDK_ARCHIVE_PATH.
 set -euo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
@@ -56,7 +57,12 @@ if is_working_jvm "$INSTALL_DIR"; then
 	echo "JDK already installed and working: $INSTALL_DIR"
 else
 	echo "Installing JDK $JVM to $INSTALL_DIR"
-	curl -fL --retry 3 -o "$TEMP_DIR/$ZIP" "$URL"
+	if [ -n "${JDK_ARCHIVE_PATH:-}" ]; then
+		# Reuse a pre-downloaded archive (payload builds) instead of re-downloading
+		cp "$JDK_ARCHIVE_PATH" "$TEMP_DIR/$ZIP"
+	else
+		curl -fL --retry 3 -o "$TEMP_DIR/$ZIP" "$URL"
+	fi
 	rm -rf "$INSTALL_DIR"
 	EXTRACT_DIR=$TEMP_DIR/extract
 	mkdir -p "$EXTRACT_DIR"

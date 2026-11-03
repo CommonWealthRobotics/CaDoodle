@@ -18,8 +18,14 @@ export ARCH=x86_64
 # JVM from jvm.json: download+install to the shared root and resolve JAVA_HOME
 set -e
 JVM_SCRIPTS=$SCRIPT_DIR/jvm
-bash $JVM_SCRIPTS/installJdk.sh
 JVM_ARCHIVE=$(bash $JVM_SCRIPTS/getJdkArchiveFile.sh)
+# One download serves both the local install and the shipped payload
+if [ ! -f "$JVM_ARCHIVE" ]; then
+  JVM_URL=$(bash $JVM_SCRIPTS/getJdkUrl.sh)
+  echo "Downloading $JVM_URL"
+  curl -fL --retry 3 -o "$JVM_ARCHIVE" "$JVM_URL"
+fi
+JDK_ARCHIVE_PATH=$PWD/$JVM_ARCHIVE bash $JVM_SCRIPTS/installJdk.sh
 export JAVA_HOME=$(bash $JVM_SCRIPTS/getJdkHome.sh)
 
 ./gradlew shadowJar
@@ -31,7 +37,7 @@ JAR_NAME=CaDoodleUpdater.jar
 echo "Test jar complete"
 ls -al $JAVA_HOME
 
-cp $JVM_SCRIPTS/$JVM_ARCHIVE $DIR/
+cp "$JVM_ARCHIVE" "$DIR/"
 cp CaDoodle-ApplicationInstall.zip $DIR/
 
 ICON=$NAME.png
