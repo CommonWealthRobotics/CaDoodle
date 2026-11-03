@@ -137,6 +137,7 @@ public class CadoodleUpdater {
 
 	public static String repoName;
 	public static String jarName;
+	public static String JAVA_HOME="";
 
 	@FXML
 	void onNo(ActionEvent event) {
@@ -348,7 +349,7 @@ public class CadoodleUpdater {
 
 			String finalCommand = fc;
 			System.out.println("Running:\n\n" + finalCommand + "\n\n");
-			System.out.println("JAVA_HOME: " + extractJavaHomeFromCommand(command) + "\n\n");
+			System.out.println("JAVA_HOME: " + JAVA_HOME + "\n\n");
 
 			new Thread(() -> {
 				try {
@@ -357,7 +358,7 @@ public class CadoodleUpdater {
 
 					// Extract JAVA_HOME from the JVM path
 					// Assuming your command starts with the full path to java executable
-					String javaHome = extractJavaHomeFromCommand(command);
+					String javaHome = JAVA_HOME;
 					if (javaHome != null)
 						env.put("JAVA_HOME", javaHome);
 					if (pluginExtracted != null) {
@@ -430,31 +431,7 @@ public class CadoodleUpdater {
 		}).start();
 	}
 
-	private static String extractJavaHomeFromCommand(String command) {
-		try {
-			// Split the command to get the java executable path
-			String[] parts = command.split(" ");
-			if (parts.length > 0) {
-				String javaPath = parts[0];
 
-				// Remove quotes if present
-				javaPath = javaPath.replace("\"", "");
-
-				// Get the parent directory of the bin folder
-				Path path = Paths.get(javaPath);
-				if (path.getFileName().toString().startsWith("java")) {
-					// Go up from java executable to bin, then to JAVA_HOME
-					Path binDir = path.getParent();
-					if (binDir != null && binDir.getFileName().toString().equals("bin")) {
-						return binDir.getParent().toString();
-					}
-				}
-			}
-		} catch (Exception e) {
-			System.err.println("Could not extract JAVA_HOME from command: " + e.getMessage());
-		}
-		return null;
-	}
 
 	public static boolean isWin() {
 		return System.getProperty("os.name").toLowerCase().contains("windows");

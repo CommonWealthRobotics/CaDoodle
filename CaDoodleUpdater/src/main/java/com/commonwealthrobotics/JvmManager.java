@@ -100,7 +100,8 @@ public class JvmManager {
 
 			String jvmURL = baseURL + name + "." + type;
 			jvmArchive = download("", jvmURL, progressBar, progressLabel, bindir, name + "." + type);
-			dest = new File(bindir + name);
+			File destinationFile = new File(bindir + name);
+			dest = destinationFile;
 			if (!dest.exists()) {
 				if (type.toLowerCase().contains("zip")) {
 					try {
@@ -121,9 +122,12 @@ public class JvmManager {
 			}
 			String cmd = bindir + name + "/bin/java" + (CadoodleUpdater.isWin() ? ".exe" : "") + " ";
 			File cmdFile = new File(cmd);
-			if(!cmdFile.exists() && CadoodleUpdater.isMac()) {
-				for(String s:cmdFile.list()) {
-					Path working = cmdFile.toPath().resolve(s);
+			boolean exists = cmdFile.exists();
+			boolean mac = CadoodleUpdater.isMac();
+			if( mac) {
+				System.out.println("Java is not in standard location "+cmd);
+				for(String s:destinationFile.list()) {
+					Path working = destinationFile.toPath().resolve(s);
 					Path newHome = working.resolve("Contents").resolve("Home");
 					File file = newHome.resolve("bin").resolve("java").toFile();
 					if(file.exists()) {
@@ -132,16 +136,17 @@ public class JvmManager {
 					}
 				}
 			}
+			CadoodleUpdater.JAVA_HOME = destinationFile.getAbsolutePath();
 			// Mac OS set the dock icon
 			String iconPath = extractIconToTemp();
 			if (iconPath != null) {
-				if (CadoodleUpdater.isMac()) {
-					cmd += "-Xdock:icon=" + iconPath + " ";
-					cmd += "-Xdock:name=CADoodle ";
+				if (mac) {
+					cmd += " -Xdock:icon=" + iconPath + " ";
+					cmd += " -Xdock:name=CADoodle ";
 				}
 				if (CadoodleUpdater.isLin()) {
-					cmd += "-Dcadoodle.icon.path=" + iconPath + " ";
-					cmd += "-Dglass.gtk.wmclass=CaDoodle ";
+					cmd += " -Dcadoodle.icon.path=" + iconPath + " ";
+					cmd += " -Dglass.gtk.wmclass=CaDoodle ";
 				}
 			}
 			for (String s : jvmargs) {
