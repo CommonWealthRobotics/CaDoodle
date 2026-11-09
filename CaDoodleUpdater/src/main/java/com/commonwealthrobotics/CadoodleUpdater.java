@@ -228,9 +228,10 @@ public class CadoodleUpdater {
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				System.out.println("Download failed!");
-				infoBar.setText("Download failed! " + e1.getMessage());
-				downloadFailed = true;
+
 				e1.printStackTrace();
+				Platform.runLater(()-> infoBar.setText("Download failed! " + e1.getMessage()));
+				downloadFailed = true;
 			}
 
 			if (!downloadFailed)
@@ -568,12 +569,13 @@ public class CadoodleUpdater {
 					System.out.println(downloadZip + " Size " + sizeOfZip + " bytes");
 				}
 			}
-			if (downloadJarURL == null) {
-				System.err.println("FAIL the Jar is missing in release " + latestVersionString);
-				System.exit(1);
-			}
+
 		} finally {
 			is.close();
+		}
+		if (downloadJarURL == null) {
+			System.err.println("FAIL the Jar is missing in release " + latestVersionString);
+			System.exit(1);
 		}
 	}
 
@@ -663,6 +665,13 @@ public class CadoodleUpdater {
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
 	void onFirstYes(ActionEvent ev) {
+		try {
+			readCurrentVersion();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(3);
+		}
 		runPluginProcess();
 		onYes(ev);
 	}
@@ -685,7 +694,7 @@ public class CadoodleUpdater {
 			Platform.runLater(() -> {
 				if (!noInternet) {
 					try {
-						readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases");
+						readCurrentVersion();
 						binary.setText(jarName + " " + (sizeOfJar / 1000000) + " MB");
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -698,6 +707,10 @@ public class CadoodleUpdater {
 			});
 		}).start();
 
+	}
+
+	private void readCurrentVersion() throws IOException, URISyntaxException {
+		readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases");
 	}
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
@@ -853,7 +866,7 @@ public class CadoodleUpdater {
 				myVersionString = new String(Files.readAllBytes(Paths.get(myVersionFileString))).trim();
 				if (!noInternet) {
 					try {
-						readCurrentVersion("https://api.github.com/repos/" + project + "/" + repoName + "/releases");
+						readCurrentVersion();
 						String bugfixFileName = bindir + "pinBugfixVersion";
 						File bugfixFile = new File(bugfixFileName);
 						String updateMode = "Nightly Feature";
